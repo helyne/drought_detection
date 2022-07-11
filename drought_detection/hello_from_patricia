@@ -1,2 +1,3 @@
 def hello(sentence="Hello from Patricia"):
+    ''' Function that says hello'''
     return sentence
