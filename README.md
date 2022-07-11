@@ -1,8 +1,8 @@
 # Data analysis
 - Document here the project: drought_detection
-- Description: Project Description
-- Data Source:
-- Type of analysis:
+- Description: A project for Satellite-based Prediction of Forage Conditions for Livestock in Northern Kenya
+- Data Source: https://wandb.ai/wandb/droughtwatch/benchmark
+- Type of analysis: Deep learning CNN multi-class image classification
 
 Please document the project the better you can.
 
