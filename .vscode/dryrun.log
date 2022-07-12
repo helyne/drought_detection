@@ -1,0 +1,5 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/lluismorey/code/helyne/drought_detection'
+pip install -r requirements.txt
+make: Leaving directory '/home/lluismorey/code/helyne/drought_detection'
+ 
