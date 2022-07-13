@@ -8,7 +8,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # This program built for i386-apple-darwin11.3.0
  
 
-# Make data base, printed on Tue Jul 12 00:01:09 2022
+# Make data base, printed on Tue Jul 12 21:56:12 2022
 
 # Variables
 
@@ -54,7 +54,7 @@ __CFBundleIdentifier = com.microsoft.VSCode
 # makefile (from `Makefile', line 47)
 PYPI_USERNAME = <AUTHOR>
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /var/folders/x7/f623m9850hq_0rrrhkqwyvn40000gn/T/vscode-ipc-397a31aa-68c3-454a-aa39-9329616bd0d5.sock
+VSCODE_IPC_HOOK_EXTHOST = /var/folders/x7/f623m9850hq_0rrrhkqwyvn40000gn/T/vscode-ipc-49eb1452-133e-4562-a32b-bcd7365ede60.sock
 # environment
 VSCODE_CWD = /Users/christopherhitz/code/helyne/drought_detection
 # environment
@@ -150,7 +150,7 @@ TERM_PROGRAM_VERSION = 443
 # environment
 NVM_DIR = /Users/christopherhitz/.nvm
 # environment
-XPC_SERVICE_NAME = application.com.microsoft.VSCode.2337075.2337081.EA91572A-C6FA-4FEE-A77C-8DDF9AA7036F
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.2337075.2337081.E22B5D98-65CC-4BEE-BE42-59DA46019097
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
 # makefile (from `Makefile', line 87)
@@ -191,7 +191,6 @@ PYENV_VIRTUALENV_INIT = 1
 .INCLUDE_DIRS = /usr/local/include
 # environment
 MAKELEVEL := 0
- 
 # environment
 LANG = C
 # environment
@@ -252,7 +251,6 @@ pypi:
 	
 
 # Not a target:
- 
 .SUFFIXES:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
@@ -342,7 +340,6 @@ clean:
 #  Implicit rule search has not been done.
 #  Implicit/static pattern stem: `'
 #  File does not exist.
- 
 #  File has been updated.
 #  Needs to be updated (-q is set).
 # automatic
@@ -392,6 +389,7 @@ install:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
+ 
 #  commands to execute (from `Makefile', line 29):
 	@pip install . -U
 	
@@ -409,6 +407,6 @@ install:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Tue Jul 12 00:01:09 2022
+# Finished Make data base on Tue Jul 12 21:56:12 2022
 
  
