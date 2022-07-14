@@ -1,11 +1,5 @@
 make --dry-run --always-make --keep-going --print-directory
-<<<<<<< HEAD
 make: Entering directory '/home/lluismorey/code/helyne/drought_detection'
 pip install -r requirements.txt
 make: Leaving directory '/home/lluismorey/code/helyne/drought_detection'
-=======
-make: Entering directory `/Users/christopherhitz/code/helyne/drought_detection'
-pip install -r requirements.txt
-make: Leaving directory `/Users/christopherhitz/code/helyne/drought_detection'
->>>>>>> de7d122c331c58e7146da7a8da598ac1a86b5ee3
  

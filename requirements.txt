@@ -7,8 +7,12 @@ wheel>=0.29
 # data science
 numpy
 pandas
-#scikit-learn
+matplotlib
+scikit-learn
 tensorflow
+tensorflow_datasets
+tensorflow_hub
+tensorflow_addons
 h5py
 
 # tests/linter
