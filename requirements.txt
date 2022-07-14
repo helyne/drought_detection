@@ -9,6 +9,7 @@ numpy
 pandas
 #scikit-learn
 tensorflow
+h5py
 
 # tests/linter
 coverage
