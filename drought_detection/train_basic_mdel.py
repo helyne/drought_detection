@@ -6,7 +6,7 @@ from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras import layers
 from tensorflow.keras import models
-
+from tensorflow.keras.models import save_model
 
 def load_dataset():
     print("======================================starting======================================")
@@ -74,6 +74,10 @@ def train_model(X_train, y_train_cat):
 
     return history
 
+def save_model(model):
+    """Save the model"""
+    save_model(model, "model.h5")
+    print("Saved model to disk")
 
 
 '''
