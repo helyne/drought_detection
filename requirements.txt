@@ -13,6 +13,8 @@ tensorflow
 tensorflow_datasets
 tensorflow_hub
 tensorflow_addons
+h5py
+
 # tests/linter
 coverage
 flake8

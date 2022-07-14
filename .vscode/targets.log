@@ -6,7 +6,9 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
+
 # Make data base, printed on Thu Jul 14 14:25:36 2022
+
 
 # Variables
 
@@ -49,9 +51,11 @@ GNUMAKEFLAGS :=
 # makefile (from 'Makefile', line 47)
 PYPI_USERNAME = <AUTHOR>
 # environment
+
 VSCODE_CWD = /mnt/c/Users/heyll/AppData/Local/Programs/Microsoft VS Code
 # default
 MAKE_HOST := x86_64-pc-linux-gnu
+
 # environment
 PATH = /home/lluismorey/.vscode-server/bin/b06ae3b2d2dbfe28bca3134cc6be65935cdfea6a/bin/remote-cli:./bin:./node_modules/.bin:/home/lluismorey/.pyenv/plugins/pyenv-virtualenv/shims:/home/lluismorey/.pyenv/shims:/home/lluismorey/.rbenv/bin:/home/lluismorey/.pyenv/plugins/pyenv-virtualenv/shims:/home/lluismorey/.pyenv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Program Files (x86)/Intel/Intel(R) Management Engine Components/iCLS/:/mnt/c/Program Files/Intel/Intel(R) Management Engine Components/iCLS/:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files (x86)/Intel/Intel(R) Management Engine Components/DAL:/mnt/c/Program Files/Intel/Intel(R) Management Engine Components/DAL:/mnt/c/Users/heyll/AppData/Roaming/nvm:/mnt/c/Program Files/nodejs:/mnt/c/Program Files/Java/jdk-13.0.2/bin:/mnt/c/Program Files/Git/cmd:/mnt/c/Program Files/Docker/Docker/resources/bin:/mnt/c/ProgramData/DockerDesktop/version-bin:/mnt/c/Users/heyll/AppData/Local/Programs/Python/Python38/Scripts/:/mnt/c/Users/heyll/AppData/Local/Programs/Python/Python38/:/mnt/c/Users/heyll/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/heyll/AppData/Local/Programs/Microsoft VS Code/bin:/usr/local/sbin
 # environment
@@ -143,7 +147,9 @@ MFLAGS = -pqrR
 # automatic
 *D = $(patsubst %/,%,$(dir $*))
 # environment
+
 NVM_DIR = /home/lluismorey/.nvm
+
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
 # makefile (from 'Makefile', line 99)
@@ -187,11 +193,13 @@ PROJECT_ID = drought-detection
 # environment
 PYENV_VIRTUALENV_INIT = 1
 # default
+
 .INCLUDE_DIRS = /usr/include /usr/local/include /usr/include
 # makefile (from 'Makefile', line 73)
 JOB_NAME = Satellite_Images_EfficientNet_$(shell date +'%Y%m%d_%H%M%S')
 # default
 .RECIPEPREFIX := 
+
 # environment
 LANG = C
 # environment
@@ -396,7 +404,9 @@ install:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
+
 #  recipe to execute (from 'Makefile', line 29):
+
 	@pip install . -U
 
 # files hash-table stats:
@@ -410,9 +420,11 @@ install:
 # strcache buffers: 1 (0) / strings = 41 / storage = 396 B / avg = 9 B
 # current buf: size = 8162 B / used = 396 B / count = 41 / avg = 9 B
 
+
 # strcache performance: lookups = 69 / hit rate = 40%
 # hash-table stats:
 # Load=41/8192=1%, Rehash=0, Collisions=1/69=1%
 # Finished Make data base on Thu Jul 14 14:25:36 2022
+
 
  
