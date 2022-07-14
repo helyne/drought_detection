@@ -70,10 +70,10 @@ BUCKET_NAME=wagon-data-batch913-drought_detection
 REGION=europe-west1
 
 
-JOB_NAME=train_basic_mdel_$(shell date +'%Y%m%d_%H%M%S')
+JOB_NAME=Satellite_Images_EfficientNet_$(shell date +'%Y%m%d_%H%M%S')
 
 PACKAGE_NAME=drought_detection
-FILENAME=train_basic_mdel
+FILENAME=Satellite_Images_EfficientNet
 
 PYTHON_VERSION=3.7
 FRAMEWORK=scikit-learn

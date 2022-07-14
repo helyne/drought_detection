@@ -6,10 +6,12 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Wed Jul 13 15:31:09 2022
+# Make data base, printed on Thu Jul 14 14:25:36 2022
 
 # Variables
 
+# makefile (from 'Makefile', line 76)
+FILENAME = Satellite_Images_EfficientNet
 # automatic
 <D = $(patsubst %/,%,$(dir $<))
 # automatic
@@ -30,11 +32,11 @@ HOMEBREW_NO_ANALYTICS = 1
 CURDIR := /home/lluismorey/code/helyne/drought_detection
 # makefile
 SHELL = /bin/sh
-# makefile (from 'Makefile', line 84)
+# makefile (from 'Makefile', line 95)
 LOCAL_PATH = "./drought_detection/data/tmp.csv"
 # environment
 VSCODE_NLS_CONFIG = {"locale":"en","availableLanguages":{}}
-# makefile (from 'Makefile', line 90)
+# makefile (from 'Makefile', line 102)
 BUCKET_FILE_NAME = $(shell basename ${LOCAL_PATH})
 # environment
 _ = /mnt/c/Users/heyll/AppData/Local/Programs/Microsoft VS Code/bin/code
@@ -56,12 +58,14 @@ PATH = /home/lluismorey/.vscode-server/bin/b06ae3b2d2dbfe28bca3134cc6be65935cdfe
 LSCOLORS = Gxfxcxdxbxegedabagacad
 # environment
 VIRTUAL_ENV = /home/lluismorey/.pyenv/versions/3.8.12/envs/drought_detection
+# makefile (from 'Makefile', line 80)
+RUNTIME_VERSION = 2.8
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # environment
 PYENV_ROOT = /home/lluismorey/.pyenv
 # environment
-VSCODE_IPC_HOOK_CLI = /tmp/vscode-ipc-e966e879-8d66-4ba9-9e9d-f25793be64f7.sock
+VSCODE_IPC_HOOK_CLI = /tmp/vscode-ipc-aa4380ab-4edc-45e6-a9d2-24c95ee2b1da.sock
 # default
 .FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync check-symlink load
 # environment
@@ -77,9 +81,9 @@ PWD = /home/lluismorey/code/helyne/drought_detection
 # environment
 SSH_AGENT_PID = 365
 # environment
-WSL_INTEROP = /run/WSL/31970_interop
+WSL_INTEROP = /run/WSL/25342_interop
 # environment
-WT_SESSION = 7475c227-b99d-41ca-a717-87af892ea001
+WT_SESSION = 5b484ddf-3520-4d5c-aa98-259f0fce72eb
 # environment
 VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
 # environment
@@ -91,7 +95,7 @@ LOGNAME = lluismorey
 # environment
 BUNDLER_EDITOR = code
 # environment
-APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
 # environment
 PYTHONBREAKPOINT = ipdb.set_trace
 # environment
@@ -118,6 +122,8 @@ NAME = Code
 LESS = -R
 # automatic
 %D = $(patsubst %/,%,$(dir $%))
+# makefile (from 'Makefile', line 78)
+PYTHON_VERSION = 3.7
 # environment
 VSCODE_WSL_EXT_LOCATION = /mnt/c/Users/heyll/.vscode/extensions/ms-vscode-remote.remote-wsl-0.66.3
 # default
@@ -140,7 +146,7 @@ MFLAGS = -pqrR
 NVM_DIR = /home/lluismorey/.nvm
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
-# makefile (from 'Makefile', line 87)
+# makefile (from 'Makefile', line 99)
 BUCKET_FOLDER = data
 # automatic
 +F = $(notdir $+)
@@ -150,12 +156,16 @@ REGION = europe-west1
 BUCKET_NAME = wagon-data-batch913-drought_detection
 # environment
 VSCODE_HANDLES_SIGPIPE = true
+# makefile (from 'Makefile', line 75)
+PACKAGE_NAME = drought_detection
 # environment
 WT_PROFILE_ID = {2c4de342-38b7-51cf-b940-2309a097f518}
 # default
 MAKEFILES := 
 # automatic
 <F = $(notdir $<)
+# makefile (from 'Makefile', line 79)
+FRAMEWORK = scikit-learn
 # environment
 EDITOR = code
 # environment
@@ -178,6 +188,8 @@ PROJECT_ID = drought-detection
 PYENV_VIRTUALENV_INIT = 1
 # default
 .INCLUDE_DIRS = /usr/include /usr/local/include /usr/include
+# makefile (from 'Makefile', line 73)
+JOB_NAME = Satellite_Images_EfficientNet_$(shell date +'%Y%m%d_%H%M%S')
 # default
 .RECIPEPREFIX := 
 # environment
@@ -187,7 +199,7 @@ TERM = xterm-256color
 # environment
 WSL_DISTRO_NAME = Ubuntu
 # variable set hash-table stats:
-# Load=88/1024=9%, Rehash=0, Collisions=5/116=4%
+# Load=94/1024=9%, Rehash=0, Collisions=6/122=5%
 
 # Pattern-specific Variable Values
 
@@ -195,9 +207,9 @@ WSL_DISTRO_NAME = Ubuntu
 
 # Directories
 
-# . (device 2064, inode 243432): 19 files, no impossibilities.
+# . (device 2064, inode 243432): 20 files, no impossibilities.
 
-# 19 files, no impossibilities in 1 directories.
+# 20 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -244,7 +256,7 @@ pypi:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-07-13 10:35:21.722327
+#  Last modified 2022-07-14 12:39:39.006113
 #  File has been updated.
 #  Successfully updated.
 
@@ -256,6 +268,21 @@ test:
 	@coverage run -m pytest tests/*.py
 	@coverage report -m --omit="${VIRTUAL_ENV}/lib/python*"
 
+gcp_submit_training:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 114):
+	gcloud ai-platform jobs submit training ${JOB_NAME} \
+		--job-dir gs://${BUCKET_NAME}/${BUCKET_TRAINING_FOLDER} \
+		--package-path ${PACKAGE_NAME} \
+		--module-name ${PACKAGE_NAME}.${FILENAME} \
+		--python-version=${PYTHON_VERSION} \
+		--runtime-version=${RUNTIME_VERSION} \
+		--region ${REGION} \
+		--stream-logs
+
+ 
 build:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
@@ -267,15 +294,14 @@ upload_data:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 95):
+#  recipe to execute (from 'Makefile', line 107):
 	@gsutil cp ${LOCAL_PATH} gs://${BUCKET_NAME}/${BUCKET_FOLDER}
 
 set_project:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 73):
- 
+#  recipe to execute (from 'Makefile', line 84):
 	@gcloud config set project ${PROJECT_ID}
 
 check_code:
@@ -310,7 +336,7 @@ create_bucket:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 76):
+#  recipe to execute (from 'Makefile', line 87):
 	@gsutil mb -l ${REGION} -p ${PROJECT_ID} gs://${BUCKET_NAME}
 
 clean:
@@ -349,7 +375,7 @@ streamlit:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 99):
+#  recipe to execute (from 'Makefile', line 111):
 	-@streamlit run app.py
 
 ftest:
@@ -374,19 +400,19 @@ install:
 	@pip install . -U
 
 # files hash-table stats:
-# Load=19/1024=2%, Rehash=0, Collisions=0/36=0%
+# Load=20/1024=2%, Rehash=0, Collisions=0/37=0%
 # VPATH Search Paths
 
 # No 'vpath' search paths.
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 39 / storage = 374 B / avg = 9 B
-# current buf: size = 8162 B / used = 374 B / count = 39 / avg = 9 B
+# strcache buffers: 1 (0) / strings = 41 / storage = 396 B / avg = 9 B
+# current buf: size = 8162 B / used = 396 B / count = 41 / avg = 9 B
 
-# strcache performance: lookups = 66 / hit rate = 40%
+# strcache performance: lookups = 69 / hit rate = 40%
 # hash-table stats:
-# Load=39/8192=0%, Rehash=0, Collisions=1/66=2%
-# Finished Make data base on Wed Jul 13 15:31:09 2022
+# Load=41/8192=1%, Rehash=0, Collisions=1/69=1%
+# Finished Make data base on Thu Jul 14 14:25:36 2022
 
  
