@@ -19,6 +19,8 @@ BUCKET_NAME = 'wagon-data-batch913-drought_detection'
 # butcket data file location
 BUCKET_TRAIN_DATA_PATH = 'data/train'
 BUCKET_VAL_DATA_PATH = 'data/val'
+BUCKET_SAVED_MODEL_PATH = 'SavedModel/'
+
 
 # # GS bucket location path
 # GS_BUCKET_PATH_LINK = f"gs://{BUCKET_NAME}/{BUCKET_TRAIN_DATA_PATH}"
