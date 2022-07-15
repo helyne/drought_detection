@@ -76,6 +76,7 @@ def transform_sat_img(parsed_sat_file, bands_=['B4', 'B3', 'B2'], intensify_=Tru
 
 # function to load single file (can be from 'gs:://BUCKET')
 def load_img(file='../raw_data/train/part-r-00001', bands=['B4', 'B3', 'B2'], intensify=True):
+    '''loads a single image from a file, outputs an imgArray and label'''
     parsed_sat1 = read_sat_file(file, bands_=bands)
     imgArray, label = transform_sat_img(parsed_sat1, bands_=bands, intensify_=intensify)
     return imgArray, label
@@ -160,17 +161,40 @@ def get_images_gcp(n=2, data_set='train', bands=['B4', 'B3', 'B2']):
     return images, labels
 
 
+def read_one_whole_rec(data, band='B1'):
+    tfrecord_format = (
+            {
+            band: tf.io.FixedLenFeature([], tf.string),    # 0.43 - 0.45 μm Coastal aerosol
+            'label': tf.io.FixedLenFeature([], tf.int64),
+            }
+        )
+    data = tf.io.parse_example(data, tfrecord_format)
+    img = tf.io.decode_raw(data[band], tf.uint8)
+    #expecting this original image size
+    img = tf.reshape(img, [65,65,1])
+    lab = data["label"]
+    return img, lab
+
 
 if __name__ == '__main__':
-    # train_imgs, train_labels = load_imgs_set(directory="gs://wagon-data-batch913-drought_detection/data/train/",
-    #                              n_files=5,
-    #                              bands=['B4', 'B3', 'B2'])
+    # Load data using gs bucket link method
+    train_imgs, train_labels = load_imgs_set(directory="gs://wagon-data-batch913-drought_detection/data/train/",
+                                 n_files=5,
+                                 bands=['B4', 'B3', 'B2'])
 
-    # val_imgs, val_labels = load_imgs_set(directory="gs://wagon-data-batch913-drought_detection/data/val/",
-    #                              n_files=5,
-    #                              bands=['B4', 'B3', 'B2'])
+    val_imgs, val_labels = load_imgs_set(directory="gs://wagon-data-batch913-drought_detection/data/val/",
+                                 n_files=5,
+                                 bands=['B4', 'B3', 'B2'])
 
-    train_imgs, train_labels = get_images_gcp()
-    val_imgs, val_labels = get_images_gcp(data_set='val')
+    # Load data using GCP blobs method
+    # train_imgs, train_labels = get_images_gcp()
+    # val_imgs, val_labels = get_images_gcp(data_set='val')
+
+    # # Load data using wind speed notebook method (not complete)
+    # train_images = tf.data.TFRecordDataset(
+    #     "gs://wagon-data-batch913-drought_detection/data/val/part-r-00000"
+    # )
+    # ds_train = train_images.map(read_one_whole_rec)
+
 
     print(val_labels)
