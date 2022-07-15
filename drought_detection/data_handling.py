@@ -99,6 +99,7 @@ def load_imgs_set(directory='../raw_data/train/', n_files = 2, bands=['B4', 'B3'
             images (list): list of processed images (65x65 pixels each) in n-Dimensions (depends on number of bands chosen)
             labels (list): list of corresponding labels (as int32)
     '''
+    filenames = []
     images = []
     labels = []
 
@@ -106,10 +107,11 @@ def load_imgs_set(directory='../raw_data/train/', n_files = 2, bands=['B4', 'B3'
 
     for n in range(n_files):
         imgArray, label = load_img(file=files[n], bands=bands, intensify=intensify)
+        filenames.append(files[n])
         images.append(imgArray)
         labels.append(label)
 
-    return images, labels
+    return filenames, images, labels
 
 
 
@@ -174,6 +176,31 @@ def read_one_whole_rec(data, band='B1'):
     img = tf.reshape(img, [65,65,1])
     lab = data["label"]
     return img, lab
+
+
+def make_prefetch_dataset(filenames, images, labels):
+    '''
+    This function transforms our data into the correct data structure for modelling.
+
+    Parameters:
+            filenames (list): a list of satellite files
+            images (tuple): tuple of processed images in n-Dimensional arrays (depends on number of bands chosen)
+            label (list): list of corresponding labels (as int32)
+
+    Returns:
+            dataset (PrefetchDataset):
+                <PrefetchDataset shapes: {filename: (), image: (65, 65, 3), label: ()},
+                types: {filename: tf.string, image: tf.uint8, label: tf.int64}>
+    '''
+    AUTO = tf.data.experimental.AUTOTUNE
+
+    dataset = tf.data.Dataset.from_tensor_slices({'filename': filenames,
+                                                'image': images,
+                                                'label': labels})
+    # dataset = dataset.shuffle(2048) # we shuffle later, not sure we need it here
+    dataset = dataset.prefetch(AUTO)
+
+    return dataset
 
 
 if __name__ == '__main__':
