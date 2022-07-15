@@ -28,7 +28,12 @@ BUCKET_VAL_DATA_PATH = 'data/val'
 
 # GCP_AI_PLATFORM =
 
+
+
+
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+
 
 
 ### MLFLOW configuration - - - - - - - - - - - - - - - - - - -
@@ -36,22 +41,21 @@ BUCKET_VAL_DATA_PATH = 'data/val'
 MLFLOW_URI = "https://mlflow.lewagon.ai/"
 EXPERIMENT_NAME = "[DEU] [berlin] [helyne] drought_baseline + v1"
 
+
 ### DATA & MODEL LOCATIONS  - - - - - - - - - - - - - - - - - - -
 
 PATH_TO_LOCAL_MODEL = 'model.joblib'
-
-# AWS_BUCKET_TEST_PATH = "s3://wagon-public-datasets/taxi-fare-test.csv"
-
 
 
 ##### Training  - - - - - - - - - - - - - - - - - - - - - -
 
 # not required here
 
+
 ##### Model - - - - - - - - - - - - - - - - - - - - - - - -
 
 # model folder name (will contain the folders for all trained model versions)
-MODEL_NAME = 'drought_baseline'
+MODEL_NAME = 'satellite-classification'
 
 # model version folder name (where the trained model.joblib file will be stored)
 MODEL_VERSION = 'v1'
