@@ -1,19 +1,19 @@
 # python script that handles data (retrieved from the cloud)
-
-import os
 import numpy as np
 import tensorflow as tf
 from google.cloud import storage
-import tempfile
-# from drought_detection.params import BUCKET_NAME, BUCKET_TRAIN_DATA_PATH
 
 
-# list files in directory
-def dirlist(directory):
+# list files in directory from google storage
+def dirlist(dataset='train'):
     '''list files in directory'''
-    return [os.path.join(directory, file) for file in os.listdir(directory) if 'part-' in file]
+    client = storage.Client()
+    bucket = client.bucket('wagon-data-batch913-drought_detection')
+    blobs = list(bucket.list_blobs(prefix=f'data/{dataset}/part'))
+    return [blob_.name for blob_ in blobs]
 
-# function to read raw satellite file data into a list of tensor dictionaries
+
+# function to read raw satellite file data
 def read_sat_file(image_file, bands_):
     '''
     This function filters satellite image data by specific spectral bands
@@ -40,7 +40,7 @@ def read_sat_file(image_file, bands_):
     return parsed_sat_file
 
 
-# function that converts a raw sat image (tensorflow object) to matrix of numbers & label (it also scales bands)
+# function to convert a raw sat image (tensorflow object) to matrix of numbers & label (it also scales bands)
 def transform_sat_img(parsed_sat_file, bands_=['B4', 'B3', 'B2'], intensify_=True):
     '''
     This function creates a 3D imgArray in shape 65 x 65 x n_bands (65x65 pixels) for
@@ -75,23 +75,22 @@ def transform_sat_img(parsed_sat_file, bands_=['B4', 'B3', 'B2'], intensify_=Tru
 
 
 # function to load single file (can be from 'gs:://BUCKET')
-def load_img(file='../raw_data/train/part-r-00001', bands=['B4', 'B3', 'B2'], intensify=True):
+def load_single_img(image_file='../raw_data/train/part-r-00001', bands=['B4', 'B3', 'B2'], intensify=True):
     '''loads a single image from a file, outputs an imgArray and label'''
-    parsed_sat1 = read_sat_file(file, bands_=bands)
+    parsed_sat1 = read_sat_file(image_file, bands_=bands)
     imgArray, label = transform_sat_img(parsed_sat1, bands_=bands, intensify_=intensify)
     return imgArray, label
 
 
-
 # function to load a set of files from a directory
-def load_imgs_set(directory='../raw_data/train/', n_files = 2, bands=['B4', 'B3', 'B2'], intensify=True):
+def load_imgs(dataset='train', n_files = 2, bands=['B4', 'B3', 'B2'], intensify=True):
     '''
     This function creates a list of 3D imgArrays and a list of corresponding labels for
     a set of satellite image files in a specific folder
 
     Parameters:
-            directory (path): path to directory containing raw satellite data files (can be from gs:://BUCKET)
-            n_files (int): number of files to parse and transform
+            dataset (string): one of: 'train' | 'val' | 'test'
+            n_files (int): number of files to parse and transform, max 319(train), 81(val), or 100(test)
             bands (list): list of bands to process (order is important!)
             intensify (bool): whether to scale or not (affects how bright plotted image looks(?))
 
@@ -103,86 +102,24 @@ def load_imgs_set(directory='../raw_data/train/', n_files = 2, bands=['B4', 'B3'
     images = []
     labels = []
 
-    files = dirlist(directory)
+    filenames_suffix = dirlist(dataset)[0:n_files]
 
-    for n in range(n_files):
-        imgArray, label = load_img(file=files[n], bands=bands, intensify=intensify)
-        filenames.append(files[n])
+    for filename in filenames_suffix:
+        file = f'gs://wagon-data-batch913-drought_detection/{filename}'
+        imgArray, label = load_single_img(file=file, bands=bands, intensify=intensify)
+        filenames.append(file)
         images.append(imgArray)
         labels.append(label)
 
     return filenames, images, labels
 
 
-
-# function to download images
-def get_images_gcp(n=2, data_set='train', bands=['B4', 'B3', 'B2']):
-    '''
-    This function gets images from the cloud in the correct format.
-    The function downloads images into temporary files, does a transformation, and then deletes the temporary file.
-
-    Parameters:
-            n (int): number of satellite images to process
-            data_set (str): data folder to select images ('train' or 'val')
-            bands (list): list of bands to process (order is important)
-
-    Returns:
-            images (list): list of processed images in RGB 3D arrays
-            labels (list): list of corresponding labels (as int32)
-
-    '''
-
-    # GCP bucket parameters
-    project_name = 'drought-detection'
-    bucket_name = 'wagon-data-batch913-drought_detection'
-    prefix = 'data/' + data_set + '/part'
-
-    # open client and get blobs
-    storage_client = storage.Client(project=project_name)
-    blobs = storage_client.list_blobs(bucket_name,
-                                      prefix=prefix, # what folder & filename prefix
-                                      delimiter='/', # don't include subdirectories
-                                      max_results=n) # max number of blobs to grab
-
-    images = []
-    labels = []
-
-    for blob in blobs:
-        # create temporary file
-        _, temp_local_filename = tempfile.mkstemp()
-        # Download blob from bucket into temp file
-        blob.download_to_filename(temp_local_filename)
-        # Do stuff to file (transform data format)
-        img_sat, img_label = load_img(file=temp_local_filename, bands=bands, intensify=True)
-        # append image (as 3D matrix) and label to lists
-        images.append(img_sat)
-        labels.append(img_label)
-        # remove temporary file
-        os.remove(temp_local_filename)
-
-    return images, labels
-
-
-def read_one_whole_rec(data, band='B1'):
-    tfrecord_format = (
-            {
-            band: tf.io.FixedLenFeature([], tf.string),    # 0.43 - 0.45 μm Coastal aerosol
-            'label': tf.io.FixedLenFeature([], tf.int64),
-            }
-        )
-    data = tf.io.parse_example(data, tfrecord_format)
-    img = tf.io.decode_raw(data[band], tf.uint8)
-    #expecting this original image size
-    img = tf.reshape(img, [65,65,1])
-    lab = data["label"]
-    return img, lab
-
-
+# function to transform images into PrefetchDataset
 def make_prefetch_dataset(filenames, images, labels):
     '''
     This function transforms our data into the correct data structure for modelling.
 
-    Parameters:
+    Parameters: (takes output directly from load_imgs_set())
             filenames (list): a list of satellite files
             images (tuple): tuple of processed images in n-Dimensional arrays (depends on number of bands chosen)
             label (list): list of corresponding labels (as int32)
@@ -203,25 +140,59 @@ def make_prefetch_dataset(filenames, images, labels):
     return dataset
 
 
+# final function to load data (read, convert, transform)
+def load_dataset(train_n = 1, val_n = 1, test_n = 1,
+                 bands=['B4', 'B3', 'B2']):
+    '''
+    This function loads train, validation, and test datasets from GCP
+
+    Parameters:
+            train_n/val_n/test_n (int): number of image files to load for each dataset
+            bands (list): list of bands to process (order is important!)
+
+    Returns:
+            train_ds (PrefetchDataset): train data
+            valid_ds (PrefetchDataset): validation data
+            test_ds (PrefetchDataset): test data
+            num_examples (int): total number of images (train + val + test)
+            num_classes (int):
+
+    '''
+    print("====================================loading dataset======================================")
+
+    # load training, testing & validation sets
+    # train data set
+    filenames, images, labels = load_imgs_set(dataset='train',
+                                              n_files = train_n,
+                                              bands=bands,
+                                              intensify=True)
+    train_ds = make_prefetch_dataset(filenames, images, labels)
+    # validation data set (data to help create metrics)
+    filenames_v, images_v, labels_v = load_imgs_set(dataset='val',
+                                              n_files = val_n,
+                                              bands=bands,
+                                              intensify=True)
+    valid_ds = make_prefetch_dataset(filenames_v, images_v, labels_v)
+    # test data (data you DO NOT TOUCH! :P)
+    filenames_t, images_t, labels_t = load_imgs_set(dataset='test',
+                                              n_files = test_n,
+                                              bands=bands,
+                                              intensify=True)
+    test_ds = make_prefetch_dataset(filenames_t, images_t, labels_t)
+
+    # # the class names
+    # class_names = [0, 1, 2, 3] # class values (eg. 0 cows, 1 cows, etc.)
+    # total number of classes (4)
+    num_classes = 4
+    # total number of images we have
+    num_examples = len(filenames) + len(filenames_v) + len(filenames_t)
+
+    return train_ds, test_ds, valid_ds, num_examples, num_classes
+
+
+
 if __name__ == '__main__':
-    # Load data using gs bucket link method
-    train_imgs, train_labels = load_imgs_set(directory="gs://wagon-data-batch913-drought_detection/data/train/",
-                                 n_files=5,
-                                 bands=['B4', 'B3', 'B2'])
+    # Load data
+    train_ds, test_ds, valid_ds, num_examples, num_classes = load_dataset()
 
-    val_imgs, val_labels = load_imgs_set(directory="gs://wagon-data-batch913-drought_detection/data/val/",
-                                 n_files=5,
-                                 bands=['B4', 'B3', 'B2'])
-
-    # Load data using GCP blobs method
-    # train_imgs, train_labels = get_images_gcp()
-    # val_imgs, val_labels = get_images_gcp(data_set='val')
-
-    # # Load data using wind speed notebook method (not complete)
-    # train_images = tf.data.TFRecordDataset(
-    #     "gs://wagon-data-batch913-drought_detection/data/val/part-r-00000"
-    # )
-    # ds_train = train_images.map(read_one_whole_rec)
-
-
-    print(val_labels)
+    print(num_classes)
