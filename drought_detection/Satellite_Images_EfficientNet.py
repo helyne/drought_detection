@@ -6,6 +6,7 @@ import tensorflow as tf
 import tensorflow_datasets as tfds
 import tensorflow_hub as hub
 import tensorflow_addons as tfa
+from sklearn.metrics import f1_score
 
 def load_dataset():
     print("======================================starting======================================")
@@ -78,9 +79,9 @@ def train_model(model, num_examples):
 
     # set the training & validation steps since we're using .repeat() on our dataset
     # number of training steps
-    n_training_steps   = int(num_examples * 0.6) // batch_size
+    n_training_steps   = int(num_examples * 0.1) // batch_size #it as 0.6 before
     # number of validation steps
-    n_validation_steps = int(num_examples * 0.2) // batch_size
+    n_validation_steps = int(num_examples * 0.1) // batch_size #it as 0.2 before
     # train the model
     history = model.fit(
         train_ds, validation_data=valid_ds,
@@ -89,10 +90,36 @@ def train_model(model, num_examples):
         verbose=1, epochs=5,
         callbacks=[model_checkpoint]
 )
-    return history
+    return history, model_path
+
+def evaluate_model(model_path, all_ds):
+    print("=======================Starting evaluation=======================")
+    # load the best weights
+    model.load_weights(model_path)
+    # number of testing steps
+    n_testing_steps = int(all_ds[1].splits["train"].num_examples * 0.2)
+    # get all testing images as NumPy array
+    images = np.array([ d["image"] for d in test_ds.take(n_testing_steps) ])
+    print("images.shape:", images.shape)
+    # get all testing labels as NumPy array
+    labels = np.array([ d["label"] for d in test_ds.take(n_testing_steps) ])
+    print("labels.shape:", labels.shape)
+    # feed the images to get predictions
+    predictions = model.predict(images)
+    # perform argmax to get class index
+    predictions = np.argmax(predictions, axis=1)
+    print("predictions.shape:", predictions.shape)
+    # evaluate model
+    accuracy = tf.keras.metrics.Accuracy()
+    accuracy.update_state(labels, predictions)
+    print("Accuracy:", accuracy.result().numpy())
+    print("F1 Score:", f1_score(labels, predictions, average="macro"))
+    return accuracy
 
 if __name__=='__main__':
-    train_ds, test_ds, valid_ds, num_examples, num_classes = load_dataset()
+    # load the whole dataset, for data info
+    all_ds   = tfds.load("eurosat", with_info=True)
+    train_ds, test_ds, valid_ds, num_examples, num_classes, = load_dataset()
 
     batch_size = 64
     train_ds = prepare_for_training(train_ds, batch_size=batch_size)
@@ -101,6 +128,8 @@ if __name__=='__main__':
 
     model = initialize_model(num_classes)
 
-    history = train_model(model, num_examples)
+    history, model_path = train_model(model, num_examples)
+
+    accuracy  = evaluate_model(model_path, all_ds)
 
     print("=======================end training model=======================")
