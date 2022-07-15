@@ -1,5 +1,7 @@
 import streamlit as st
 from PIL import Image
+import numpy as np
+import tensorflow as tf
 import streamlit.components.v1 as components
 
 
@@ -34,6 +36,22 @@ st.markdown("""
 
 image = Image.open('images/kenya_example.png')
 st.image(image, caption='Nothern Kenya', use_column_width=False)
+
+
+# import saved model
+#somwthing like:
+# model = tf.keras.models.load_model("saved_model/satellite.hdf5")
+
+
+#upload image to be tested
+iploaded_file = st.file_uploader("Choose a image file")
+
+map_dict = {0: "No cows",
+            1: "One cow",
+            2: "Two cows",
+            3: "Three or more cows"
+            }
+
 
 
 

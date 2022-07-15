@@ -176,7 +176,6 @@ def read_one_whole_rec(data, band='B1'):
     return img, lab
 
 
-
 if __name__ == '__main__':
     # Load data using gs bucket link method
     train_imgs, train_labels = load_imgs_set(directory="gs://wagon-data-batch913-drought_detection/data/train/",
@@ -196,5 +195,6 @@ if __name__ == '__main__':
     #     "gs://wagon-data-batch913-drought_detection/data/val/part-r-00000"
     # )
     # ds_train = train_images.map(read_one_whole_rec)
+
 
     print(val_labels)

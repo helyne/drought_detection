@@ -69,6 +69,17 @@ BUCKET_NAME=wagon-data-batch913-drought_detection
 # choose your region from https://cloud.google.com/storage/docs/locations#available_locations
 REGION=europe-west1
 
+
+JOB_NAME=Satellite_Images_EfficientNet_$(shell date +'%Y%m%d_%H%M%S')
+
+PACKAGE_NAME=drought_detection
+FILENAME=Satellite_Images_EfficientNet
+
+PYTHON_VERSION=3.7
+FRAMEWORK=scikit-learn
+RUNTIME_VERSION=2.8
+
+
 set_project:
 	@gcloud config set project ${PROJECT_ID}
 
@@ -82,6 +93,7 @@ create_bucket:
 # ----------------------------------
 # path to the file to upload to GCP
 LOCAL_PATH="./drought_detection/data/tmp.csv"
+
 
 # bucket directory in which to store the uploaded file
 BUCKET_FOLDER=data
@@ -97,3 +109,13 @@ upload_data:
 #opens webpage
 streamlit:
 	-@streamlit run app.py
+
+gcp_submit_training:
+	gcloud ai-platform jobs submit training ${JOB_NAME} \
+		--job-dir gs://${BUCKET_NAME}/${BUCKET_TRAINING_FOLDER} \
+		--package-path ${PACKAGE_NAME} \
+		--module-name ${PACKAGE_NAME}.${FILENAME} \
+		--python-version=${PYTHON_VERSION} \
+		--runtime-version=${RUNTIME_VERSION} \
+		--region ${REGION} \
+		--stream-logs

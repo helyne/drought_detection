@@ -7,21 +7,27 @@ wheel>=0.29
 # data science
 numpy
 pandas
+matplotlib
 scikit-learn
 tensorflow
+tensorflow_datasets
+tensorflow_hub
+tensorflow_addons
+h5py
 
 # tests/linter
-black
 coverage
 flake8
 pytest
 yapf
+# black
 
 # API
 gcsfs
 google-cloud-storage
 mlflow
 s3fs
+
 
 # utilities
 six>=1.14
