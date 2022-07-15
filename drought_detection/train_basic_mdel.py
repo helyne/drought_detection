@@ -74,7 +74,7 @@ def train_model(X_train, y_train_cat):
 
     return history
 
-def save_model(model):
+def save_drought_model(model):
     """Save the model"""
     save_model(model, "model.h5")
     print("Saved model to disk")
