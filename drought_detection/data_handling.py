@@ -141,7 +141,7 @@ def make_prefetch_dataset(filenames, images, labels):
 
 
 # final function to load data (read, convert, transform)
-def load_dataset(train_n = 1, val_n = 1, test_n = 1,
+def load_dataset(train_n = 319, val_n = 81, test_n = 100,
                  bands=['B4', 'B3', 'B2']):
     '''
     This function loads train, validation, and test datasets from GCP
@@ -162,29 +162,29 @@ def load_dataset(train_n = 1, val_n = 1, test_n = 1,
 
     # load training, testing & validation sets
     # train data set
-    filenames, images, labels = load_imgs_set(dataset='train',
+    filenames, images, labels = load_imgs(dataset='train',
                                               n_files = train_n,
                                               bands=bands,
                                               intensify=True)
     train_ds = make_prefetch_dataset(filenames, images, labels)
+
     # validation data set (data to help create metrics)
-    filenames_v, images_v, labels_v = load_imgs_set(dataset='val',
+    filenames_v, images_v, labels_v = load_imgs(dataset='val',
                                               n_files = val_n,
                                               bands=bands,
                                               intensify=True)
     valid_ds = make_prefetch_dataset(filenames_v, images_v, labels_v)
+
     # test data (data you DO NOT TOUCH! :P)
-    filenames_t, images_t, labels_t = load_imgs_set(dataset='test',
+    filenames_t, images_t, labels_t = load_imgs(dataset='test',
                                               n_files = test_n,
                                               bands=bands,
                                               intensify=True)
     test_ds = make_prefetch_dataset(filenames_t, images_t, labels_t)
 
-    # # the class names
-    # class_names = [0, 1, 2, 3] # class values (eg. 0 cows, 1 cows, etc.)
-    # total number of classes (4)
+    # total number of classes (4 in our case)
     num_classes = 4
-    # total number of images we have
+    # total number of images
     num_examples = len(filenames) + len(filenames_v) + len(filenames_t)
 
     return train_ds, test_ds, valid_ds, num_examples, num_classes
