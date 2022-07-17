@@ -3,6 +3,8 @@ import numpy as np
 import tensorflow as tf
 from google.cloud import storage
 
+# example file from gs bucket:
+# gs://wagon-data-batch913-drought_detection/data/train/part-r-00090
 
 # list files in directory from google storage
 def dirlist(dataset='train'):
@@ -14,7 +16,7 @@ def dirlist(dataset='train'):
 
 
 # function to read raw satellite file data
-def read_sat_file(image_file, bands_):
+def read_sat_file(image_file, bands):
     '''
     This function filters satellite image data by specific spectral bands
     The function loads a batch of satellite images from a list of files
@@ -28,20 +30,20 @@ def read_sat_file(image_file, bands_):
     '''
     # make tfrecord format list for chosen bands
     tfrecord_format = {}
-    for b in bands_:
-        tfrecord_format[b] = tf.compat.v1.FixedLenFeature([], tf.string)
-    tfrecord_format['label'] = tf.compat.v1.FixedLenFeature([], tf.int64)
+    for b in bands:
+        tfrecord_format[b] = tf.io.FixedLenFeature([], tf.string)
+    tfrecord_format['label'] = tf.io.FixedLenFeature([], tf.int64)
 
     # load and parse one sat image
     dataset = tf.data.TFRecordDataset(image_file)
-    iterator = tf.compat.v1.data.make_one_shot_iterator(dataset)
-    parsed_sat_file = [tf.compat.v1.parse_single_example(data, tfrecord_format) for data in iterator]
+    iterator = iter(dataset)
+    parsed_sat_file = [tf.io.parse_single_example(data, tfrecord_format) for data in iterator]
 
     return parsed_sat_file
 
 
 # function to convert a raw sat image (tensorflow object) to matrix of numbers & label (it also scales bands)
-def transform_sat_img(parsed_sat_file, bands_=['B4', 'B3', 'B2'], intensify_=True):
+def transform_sat_img(parsed_sat_file, bands, intensify=True):
     '''
     This function creates a 3D imgArray in shape 65 x 65 x n_bands (65x65 pixels) for
     a single parsed satellite image, while also scaling each spectral band.
@@ -56,14 +58,14 @@ def transform_sat_img(parsed_sat_file, bands_=['B4', 'B3', 'B2'], intensify_=Tru
             label (list): list of corresponding labels (as int32)
     '''
     # convert to image array of numbers and label
-    n_bands = len(bands_) # number of of bands determines depth of imgArray
+    n_bands = len(bands) # number of of bands determines depth of imgArray
     imgArray = np.zeros((65,65,n_bands), 'uint8') # create empty array
 
     # transform, reshape, and intensity-scale image data
-    for i, band in enumerate(bands_): # order of specified bands is important because that is the order they will be appended
-        band_data = np.frombuffer(parsed_sat_file[0][band].numpy(), dtype=np.uint8) # transforms raw tensorflow data into 1D array
-        band_data = band_data.reshape(65, 65) # reshapes data into 65 x 65 pixel matrix
-        if intensify_:
+    for i, band in enumerate(bands): # order of specified bands is important because that is the order they will be appended
+        band_data = tf.io.decode_raw(parsed_sat_file[0][band], tf.uint8) # transforms raw tensorflow data into 1D array
+        band_data = tf.reshape(band_data, [65,65]) # reshapes data into 65 x 65 pixel matrix
+        if intensify:
             band_data = band_data/np.max(band_data)*255 # scaling digital numbers so image is slightly brighter
         else:
             band_data = band_data*255 # scaling digital numbers
@@ -75,15 +77,15 @@ def transform_sat_img(parsed_sat_file, bands_=['B4', 'B3', 'B2'], intensify_=Tru
 
 
 # function to load single file (can be from 'gs:://BUCKET')
-def load_single_img(image_file='../raw_data/train/part-r-00001', bands=['B4', 'B3', 'B2'], intensify=True):
+def load_single_img(image_file='../raw_data/train/part-r-00090', bands=['B4', 'B3', 'B2'], intensify=True):
     '''loads a single image from a file, outputs an imgArray and label'''
-    parsed_sat1 = read_sat_file(image_file, bands_=bands)
-    imgArray, label = transform_sat_img(parsed_sat1, bands_=bands, intensify_=intensify)
+    parsed_sat = read_sat_file(image_file, bands)
+    imgArray, label = transform_sat_img(parsed_sat, bands, intensify)
     return imgArray, label
 
 
 # function to load a set of files from a directory
-def load_imgs(dataset='train', n_files = 2, bands=['B4', 'B3', 'B2'], intensify=True):
+def load_imgs(n_files, bands=['B4', 'B3', 'B2'], intensify=True, dataset='train'):
     '''
     This function creates a list of 3D imgArrays and a list of corresponding labels for
     a set of satellite image files in a specific folder
@@ -104,13 +106,16 @@ def load_imgs(dataset='train', n_files = 2, bands=['B4', 'B3', 'B2'], intensify=
 
     filenames_suffix = dirlist(dataset)[0:n_files]
 
+    list_ds = tf.data.Dataset.list_files('gs://wagon-data-batch913-drought_detection/data/val/*')
+
     for filename in filenames_suffix:
         file = f'gs://wagon-data-batch913-drought_detection/{filename}'
-        imgArray, label = load_single_img(file=file, bands=bands, intensify=intensify)
+        parsed_sat = read_sat_file(file, bands)
+        imgArray, label = transform_sat_img(parsed_sat, bands, intensify)
+        ##### TO DO: ADD COMPOSITE BAND CALCULATIONS HERES #####
         filenames.append(file)
         images.append(imgArray)
         labels.append(label)
-
     return filenames, images, labels
 
 
@@ -129,25 +134,31 @@ def make_prefetch_dataset(filenames, images, labels):
                 <PrefetchDataset shapes: {filename: (), image: (65, 65, 3), label: ()},
                 types: {filename: tf.string, image: tf.uint8, label: tf.int64}>
     '''
-    AUTO = tf.data.experimental.AUTOTUNE
+    # # convert labels to correct type
+    # labels = np.array(labels)
+    # labels = labels.astype('int64')
 
+    # create Dataset from data
     dataset = tf.data.Dataset.from_tensor_slices({'filename': filenames,
                                                 'image': images,
                                                 'label': labels})
-    # dataset = dataset.shuffle(2048) # we shuffle later, not sure we need it here
-    dataset = dataset.prefetch(AUTO)
+
+    # convert Dataset to PrefetchDataset
+    # "If the value tf.data.AUTOTUNE is used, then the buffer size is dynamically tuned"
+    # AUTO = tf.data.experimental.AUTOTUNE
+    dataset = dataset.prefetch(tf.data.AUTOTUNE)
 
     return dataset
 
 
 # final function to load data (read, convert, transform)
-def load_dataset(train_n = 319, val_n = 81, test_n = 100,
-                 bands=['B4', 'B3', 'B2']):
+def load_dataset(train_n=319, val_n=81, test_n=100,
+                 bands=['B4', 'B3', 'B2'], intensify=True):
     '''
     This function loads train, validation, and test datasets from GCP
 
     Parameters:
-            train_n/val_n/test_n (int): number of image files to load for each dataset
+            train_n/val_n/test_n (int): number of image files to load for each dataset (max values as defaults)
             bands (list): list of bands to process (order is important!)
 
     Returns:
@@ -158,32 +169,23 @@ def load_dataset(train_n = 319, val_n = 81, test_n = 100,
             num_classes (int):
 
     '''
-    print("====================================loading dataset======================================")
-
-    # load training, testing & validation sets
-    # train data set
-    filenames, images, labels = load_imgs(dataset='train',
-                                              n_files = train_n,
-                                              bands=bands,
-                                              intensify=True)
+    print("=====================================loading train========================================")
+    # train data
+    filenames, images, labels = load_imgs(train_n, bands, intensify, dataset='train')
     train_ds = make_prefetch_dataset(filenames, images, labels)
 
+    print("===================================loading validation=====================================")
     # validation data set (data to help create metrics)
-    filenames_v, images_v, labels_v = load_imgs(dataset='val',
-                                              n_files = val_n,
-                                              bands=bands,
-                                              intensify=True)
+    filenames_v, images_v, labels_v = load_imgs(val_n, bands, intensify, dataset='val')
     valid_ds = make_prefetch_dataset(filenames_v, images_v, labels_v)
 
+    print("=====================================loading test========================================")
     # test data (data you DO NOT TOUCH! :P)
-    filenames_t, images_t, labels_t = load_imgs(dataset='test',
-                                              n_files = test_n,
-                                              bands=bands,
-                                              intensify=True)
+    filenames_t, images_t, labels_t = load_imgs(test_n, bands, intensify, dataset='test')
     test_ds = make_prefetch_dataset(filenames_t, images_t, labels_t)
 
     # total number of classes (4 in our case)
-    num_classes = 4
+    num_classes = len(set(labels))
     # total number of images
     num_examples = len(filenames) + len(filenames_v) + len(filenames_t)
 
