@@ -76,6 +76,31 @@ def transform_sat_img(parsed_sat_file, bands, intensify=True):
     return imgArray, label
 
 
+def get_ndvi(imgArray):
+    '''
+    this function computes the ndvi image (2D array of 65x65 pixels)
+    from an satellite image FILE
+
+    Parameters:
+            image_file (path): filename of image (including path)
+
+    Returns:
+            ndvi (list): a 2D (65x65 pixels) arrays of values
+            label (int): label
+
+    '''
+    # Step 1-a: cast to float32 so we can do normal matrix computations (uint8 returns to 0 after 255)
+    swapped_img = imgArray.insert(0, imgArray.pop()) # moves last element to front (does not swap first and last, which messes up order)
+    cast_image = tf.cast(swapped_img, 'float32')
+
+    # Step 1-b: calculate composite band (e.g. NDVI)
+    ndvi_tmp = (cast_image[1] - cast_image[0]) / (cast_image[1] + cast_image[0])
+
+    # Step 1-d: correct swapped index
+    ndvi = ndvi_tmp[1:] + [ndvi_tmp[0]]
+
+    return ndvi
+
 # function to load single file (can be from 'gs:://BUCKET')
 def load_single_img(image_file='../raw_data/train/part-r-00090', bands=['B4', 'B3', 'B2'], intensify=True):
     '''loads a single image from a file, outputs an imgArray and label'''
@@ -85,7 +110,7 @@ def load_single_img(image_file='../raw_data/train/part-r-00090', bands=['B4', 'B
 
 
 # function to load a set of files from a directory
-def load_imgs(n_files, bands=['B4', 'B3', 'B2'], intensify=True, dataset='train'):
+def load_imgs(n_files, bands=['B4', 'B3', 'B2'], intensify=True, dataset='train', add_ndvi=False):
     '''
     This function creates a list of 3D imgArrays and a list of corresponding labels for
     a set of satellite image files in a specific folder
@@ -106,13 +131,15 @@ def load_imgs(n_files, bands=['B4', 'B3', 'B2'], intensify=True, dataset='train'
 
     filenames_suffix = dirlist(dataset)[0:n_files]
 
-    list_ds = tf.data.Dataset.list_files('gs://wagon-data-batch913-drought_detection/data/val/*')
+    # list_ds = tf.data.Dataset.list_files('gs://wagon-data-batch913-drought_detection/data/val/*')
 
     for filename in filenames_suffix:
         file = f'gs://wagon-data-batch913-drought_detection/{filename}'
         parsed_sat = read_sat_file(file, bands)
         imgArray, label = transform_sat_img(parsed_sat, bands, intensify)
-        ##### TO DO: ADD COMPOSITE BAND CALCULATIONS HERES #####
+        # ##### TO DO: ADD COMPOSITE BAND CALCULATIONS HERES #####
+        # if add_ndvi=True:
+        #     ndvi = get_ndvi(imgArray)
         filenames.append(file)
         images.append(imgArray)
         labels.append(label)
