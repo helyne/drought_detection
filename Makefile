@@ -100,6 +100,7 @@ BUCKET_FOLDER=data
 
 # name for the uploaded file inside of the bucket (we choose not to rename the file that we upload)
 BUCKET_FILE_NAME=$(shell basename ${LOCAL_PATH})
+BUCKET_TRAINING_FOLDER = 'trainings'
 
 # "shortcut" to upload file to GCP using 'make' in terminal (in terminal: make upload_data)
 upload_data:
