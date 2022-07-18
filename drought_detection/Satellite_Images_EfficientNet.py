@@ -7,6 +7,9 @@ import tensorflow_datasets as tfds
 import tensorflow_hub as hub
 import tensorflow_addons as tfa
 from sklearn.metrics import f1_score
+from drought_detection.gcp import storage_upload
+#from tensorflow import saved_model
+from drought_detection.params import BUCKET_NAME, BUCKET_SAVED_MODEL_PATH
 
 def load_dataset():
     print("======================================starting======================================")
@@ -79,21 +82,31 @@ def train_model(model, num_examples):
 
     # set the training & validation steps since we're using .repeat() on our dataset
     # number of training steps
-    n_training_steps   = int(num_examples * 0.1) // batch_size #it as 0.6 before
+    n_training_steps   = int(num_examples * 0.1) // batch_size #it was 0.6 before
     # number of validation steps
-    n_validation_steps = int(num_examples * 0.1) // batch_size #it as 0.2 before
+    n_validation_steps = int(num_examples * 0.1) // batch_size #it was 0.2 before
     # train the model
     history = model.fit(
         train_ds, validation_data=valid_ds,
         steps_per_epoch=n_training_steps,
         validation_steps=n_validation_steps,
-        verbose=1, epochs=5,
+        verbose=1, epochs=1, #it was 5 before
         callbacks=[model_checkpoint]
-)
+    )
+    # save model
+    #storage_upload()
+    model_to_save = history
+    #BUCKET_SAVED_MODEL_PATH = 'SavedModel/'
+
+    #folder_to_save = 'gs://{BUCKET_NAME}/{BUCKET_SAVED_MODEL_PATH}'
+    tf.saved_model.save(model_to_save, 'gs://{BUCKET_NAME}/{BUCKET_SAVED_MODEL_PATH}')
+    print("===========================saved model========================")
     return history, model_path
 
 def evaluate_model(model_path, all_ds):
     print("=======================Starting evaluation=======================")
+    # load the model
+    model.load(model_path)
     # load the best weights
     model.load_weights(model_path)
     # number of testing steps
