@@ -93,20 +93,20 @@ def train_model(model, num_examples):
         verbose=1, epochs=1, #it was 5 before
         callbacks=[model_checkpoint]
     )
-    # save model
+    """save model not working
     #storage_upload()
-    model_to_save = history
+    #model_to_save = history
     #BUCKET_SAVED_MODEL_PATH = 'SavedModel/'
 
     #folder_to_save = 'gs://{BUCKET_NAME}/{BUCKET_SAVED_MODEL_PATH}'
-    tf.saved_model.save(model_to_save, 'gs://{BUCKET_NAME}/{BUCKET_SAVED_MODEL_PATH}')
+    #tf.saved_model.save(model_to_save, 'gs://{BUCKET_NAME}/{BUCKET_SAVED_MODEL_PATH}')"""
     print("===========================saved model========================")
     return history, model_path
 
 def evaluate_model(model_path, all_ds):
     print("=======================Starting evaluation=======================")
-    # load the model
-    model.load(model_path)
+    # load the model: not working
+    #model.load(model_path)
     # load the best weights
     model.load_weights(model_path)
     # number of testing steps
