@@ -90,7 +90,7 @@ def train_model(model, num_examples):
         train_ds, validation_data=valid_ds,
         steps_per_epoch=n_training_steps,
         validation_steps=n_validation_steps,
-        verbose=1, epochs=5, #it was 5 before
+        verbose=1, epochs=1, #it was 5 before
         # callbacks=[model_checkpoint]
         callbacks=callbacks
     )
