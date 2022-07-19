@@ -67,13 +67,14 @@ PROJECT_ID=drought-detection
 BUCKET_NAME=wagon-data-batch913-drought_detection
 
 # choose your region from https://cloud.google.com/storage/docs/locations#available_locations
-REGION=europe-west1
+REGION=europe-west4
 
 
-JOB_NAME=Satellite_Images_EfficientNet_$(shell date +'%Y%m%d_%H%M%S')
+
+JOB_NAME=tmp_helyne_model_save_$(shell date +'%Y%m%d_%H%M%S')
 
 PACKAGE_NAME=drought_detection
-FILENAME=Satellite_Images_EfficientNet
+FILENAME=tmp_helyne_model_save
 
 PYTHON_VERSION=3.7
 FRAMEWORK=scikit-learn
@@ -100,7 +101,7 @@ BUCKET_FOLDER=data
 
 # name for the uploaded file inside of the bucket (we choose not to rename the file that we upload)
 BUCKET_FILE_NAME=$(shell basename ${LOCAL_PATH})
-
+BUCKET_TRAINING_FOLDER = "SavedModel"
 # "shortcut" to upload file to GCP using 'make' in terminal (in terminal: make upload_data)
 upload_data:
     # @gsutil cp train_1k.csv gs://wagon-ml-my-bucket-name/data/train_1k.csv
@@ -118,4 +119,5 @@ gcp_submit_training:
 		--python-version=${PYTHON_VERSION} \
 		--runtime-version=${RUNTIME_VERSION} \
 		--region ${REGION} \
+		--scale-tier BASIC_TPU \
 		--stream-logs
