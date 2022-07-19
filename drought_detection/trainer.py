@@ -46,6 +46,8 @@ def initialize_model(num_classes):
         tf.keras.layers.Dense(num_classes, activation="softmax")
     ])
     # build the model with input image shape as (65, 65, 3)
+    # shape = train_ds.take(1)['image'].shape
+    # shape = [None, shape]
     model.build([None, 65, 65, 3]) # (placeholder for num images, 65 pixel width, 65 pixel height, 3 bands)
     model.compile(
         loss="categorical_crossentropy",
@@ -55,29 +57,11 @@ def initialize_model(num_classes):
     return model
 
 
-def upload_model_to_gcp(STORAGE_LOCATION):
-
-    BUCKET_NAME='wagon-data-batch913-drought_detection'
-
-    client = storage.Client()
-
-    bucket = client.bucket(BUCKET_NAME)
-
-    blob = bucket.blob(STORAGE_LOCATION)
-
-    blob.upload_from_filename('model.joblib')
-
 
 def train_model(model, num_examples):
     print("===========================train model========================")
 
     # setup save, checkpoint, and weights paths
-    # GCP_BUCKET = 'wagon-data-batch913-drought_detection'
-    # MODEL_FOLDER_NAME = "satellite-classification_helyne_test"
-    # SAVE_PATH = os.path.join("gs://", GCP_BUCKET, MODEL_FOLDER_NAME)
-    # tensorboard_path = os.path.join(
-        # "gs://", GCP_BUCKET, "logs", datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    # )
     model_path = "gs://wagon-data-batch913-drought_detection/classification_helyne_test"
     weights_file = "gs://wagon-data-batch913-drought_detection/weights.h5"
     checkpoint_path = "gs://wagon-data-batch913-drought_detection/classification_helyne_testsave_at_{epoch}"
@@ -85,8 +69,8 @@ def train_model(model, num_examples):
     # set model callbacks
     callbacks = [
         tf.keras.callbacks.ModelCheckpoint(checkpoint_path, save_best_only=True, verbose=1)
-        # tf.keras.callbacks.TensorBoard(log_dir=tensorboard_path, histogram_freq=1),
-        # tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=3),
+        # tf.keras.callbacks.TensorBoard(log_dir=tensorboard_path, histogram_freq=1), # if we want pretty dashboard
+        # tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=3), # if we want to use early stopping
     ]
 
     # set the training & validation steps since we're using .repeat() on our dataset
@@ -101,48 +85,40 @@ def train_model(model, num_examples):
         steps_per_epoch=n_training_steps,
         validation_steps=n_validation_steps,
         verbose=1, epochs=1, #it was 5 before
-        # callbacks=[model_checkpoint]
         callbacks=callbacks
     )
 
-    # save model
-    joblib.dump(history, 'model.joblib')
+    # save model locally
+    modelfile_name='model_test_rgb_1epoch.joblib'
+    tf.saved_model.save(model, 'drought_detection_RGB_1epoch')
+    print('saved SavedModel folder locally')
+    joblib.dump(history, modelfile_name)
     print("saved model.joblib locally")
 
-    # Implement here
-    STORAGE_LOCATION = 'SavedModel/drought_detection_RGB_1epoch/model.joblib'
-    upload_model_to_gcp(STORAGE_LOCATION)
+    # save model to gcp
+    STORAGE_LOCATION = 'SavedModel/drought_detection_RGB_1epoch/'
+    upload_model_to_gcp(modelfile_name, STORAGE_LOCATION)
     print(f"uploaded model.joblib to gcp cloud storage under \n => {STORAGE_LOCATION}")
-
-    print('saving model....')
-    # save to gcp
-    # model.save(model_path)
-    # model.save_weights(weights_file) # save weights of model
-
     print("===========================saved model========================")
     return history, model_path, weights_file
 
-def save_model(reg):
-    """method that saves the model into a .joblib file and uploads it on Google Storage /models folder
-    HINTS : use joblib library and google-cloud-storage"""
+def upload_model_to_gcp(modelfile_name, STORAGE_LOCATION):
 
-    STORAGE_LOCATION = 'SavedModel/drought_detection_RGB_1epoch/model.joblib'
-    # saving the trained model to disk is mandatory to then beeing able to upload it to storage
-    # Implement here
-    joblib.dump(reg, 'model.joblib')
-    print("saved model.joblib locally")
+    BUCKET_NAME='wagon-data-batch913-drought_detection'
 
-    # Implement here
-    upload_model_to_gcp()
-    print(f"uploaded model.joblib to gcp cloud storage under \n => {STORAGE_LOCATION}")
+    client = storage.Client()
+
+    bucket = client.bucket(BUCKET_NAME)
+
+    blob = bucket.blob(STORAGE_LOCATION)
+
+    blob.upload_from_filename(modelfile_name)
+
 
 def evaluate_model(model_path, num_examples):
     print("=======================Starting evaluation=======================")
     # load the model
     model = joblib.load(model_path)
-    # print('loading model weights')
-    # load the best weights
-    #model.load_weights(weights_file)
 
     # number of testing steps
     n_testing_steps = int(num_examples * 0.6) #it was 0.6 before
@@ -178,13 +154,14 @@ if __name__ == '__main__':
 
     valid_ds = prepare_for_training(valid_ds, num_classes, batch_size=batch_size)
 
+    print("=======================Initialize model=======================")
+
     model = initialize_model(num_classes)
 
-    print("=======================Initialize model=======================")
+    print("=======================Train model=======================")
 
     history, model_path, weights_file = train_model(model, num_examples)
 
-    print("=======================Train model=======================")
     # model_path = 'model.joblib'
     # accuracy  = evaluate_model(model_path, num_examples)
 

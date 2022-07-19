@@ -70,10 +70,10 @@ BUCKET_NAME=wagon-data-batch913-drought_detection
 REGION=europe-west1
 
 
-JOB_NAME=Satellite_Images_EfficientNet_$(shell date +'%Y%m%d_%H%M%S')
+JOB_NAME=test_rgb_1epoch_$(shell date +'%Y%m%d_%H%M%S')
 
 PACKAGE_NAME=drought_detection
-FILENAME=Satellite_Images_EfficientNet
+FILENAME=trainer
 
 PYTHON_VERSION=3.7
 FRAMEWORK=scikit-learn
@@ -100,7 +100,7 @@ BUCKET_FOLDER=data
 
 # name for the uploaded file inside of the bucket (we choose not to rename the file that we upload)
 BUCKET_FILE_NAME=$(shell basename ${LOCAL_PATH})
-BUCKET_TRAINING_FOLDER = 'trainings'
+BUCKET_TRAINING_FOLDER=trainings
 
 # "shortcut" to upload file to GCP using 'make' in terminal (in terminal: make upload_data)
 upload_data:

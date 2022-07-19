@@ -5,8 +5,17 @@ import tensorflow as tf
 import streamlit.components.v1 as components
 from tensorflow.keras.models import load_model
 from drought_detection.gcp import storage_upload
+import io
+import tensorflow_hub as hub
+import joblib
 
+# # Load the model (only executed once!)
+# @st.cache
+# def load_model():
+#     return joblib.load('SavedModel_model.joblib')
+#     # return hub.load('SavedModel_model.joblib')
 
+# model = load_model()
 
 
 st.markdown("""
@@ -46,42 +55,47 @@ st.markdown("""
 
 
 #upload image to be tested
-uploaded_file = st.file_uploader("Choose a image file")
-
-map_dict = {0: "Annual Crop",
-            1: "Forest",
-            2: "Herbaceous Vegetation",
-            3: "Highway",
-            4: "Industrial",
-            5: "Pasture",
-            6: "Permanent Crop",
-            7: "Residential",
-            8: "River",
-            9: "Sea or Lake"
-            }
-
-if uploaded_file is not None:
-    # Needs a script to convert the uploaded image in the right format
-    #formated_image = image
-    #shows uploaded image to the web
-    #st.image(formated_image)
-
-    # Generate prediction
-    Genrate_pred = st.button("Generate Prediction")
-#    if Genrate_pred:
-#        # Loads saved model
-#        saved_model=load_model('model.h5') #check path
-
-#        prediction = model.predict()
-#        st.title("Predicted Label for the image is {}".format(map_dict [prediction]))
+st.header("Image Feature Predictor")
+fileUpload = st.file_uploader("Choose a file", type = ['jpg', 'png']) # saves into temporary space
 
 
 
+if fileUpload is not None:
 
-st.markdown("""
-    ### Biography
+    # open user image file
+    image_uploaded = Image.open(fileUpload)
+    st.image(image_uploaded, caption='Output Image', use_column_width=True)
 
-    Satellite-based Prediction of Forage Conditions for Livestock in Northern Kenya. https://doi.org/10.48550/arXiv.2004.04081
+    # resize image
+    image = image_uploaded.resize((65,65))
+    st.image(image, caption='Resized Image', use_column_width=True)
+
+    # convert to np.array
+    image = np.array(image)
+    st.write(image)
+
+    # cast to int64
+    image = tf.cast(image, tf.int64) # do we need to make array??
+
+    prediction = model(image)
+
+    # Image labels
+    map_dict = {0: "no cows",
+                1: "1 cow",
+                2: "2 cows",
+                3: "3 cows"}
+
+    for m in map_dict.keys():
+        if prediction == m:
+            print(f'Your region can feed {map_dict[m]}')
+
+    st.markdown("""
+        ### Biography
+
+        Satellite-based Prediction of Forage Conditions for Livestock in Northern Kenya. https://doi.org/10.48550/arXiv.2004.04081
 
 
-""")
+    """)
+
+else:
+    st.warning('Please upload an Image file :)')
