@@ -71,7 +71,7 @@ REGION=europe-west4
 
 
 
-JOB_NAME=tmp_pat_hel_model_save_$(shell date +'%Y%m%d_%H%M%S')
+JOB_NAME=Model_HV_5epochs_$(shell date +'%Y%m%d_%H%M%S')
 
 PACKAGE_NAME=drought_detection
 FILENAME=trainer

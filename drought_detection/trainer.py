@@ -84,12 +84,12 @@ def train_model(model, num_examples):
         train_ds, validation_data=valid_ds,
         steps_per_epoch=n_training_steps,
         validation_steps=n_validation_steps,
-        verbose=1, epochs=1, #it was 5 before
+        verbose=1, epochs=5, #it was 5 before
         callbacks=callbacks
     )
 
     # set storage location in cloud
-    STORAGE_LOCATION = 'SavedModel/test_RGB_1epoch_save_with_tensorflow'
+    STORAGE_LOCATION = 'SavedModel'
 
     # save directly to gcp
     STORAGE_LOCATION = 'SavedModel/test_RGB_1epoch_save_with_tensorflow'
@@ -140,7 +140,7 @@ def evaluate_model(model_path, num_examples):
 
 if __name__ == '__main__':
     # Load data
-    train_ds, test_ds, valid_ds, num_examples, num_classes = load_dataset(bands=['B4', 'B3', 'B2'])
+    train_ds, test_ds, valid_ds, num_examples, num_classes = load_dataset(bands=['B4','B5','B1'])
 
     print("=======================Load dataset=======================")
 
