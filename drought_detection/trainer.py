@@ -84,7 +84,7 @@ def train_model(model, num_examples):
         train_ds, validation_data=valid_ds,
         steps_per_epoch=n_training_steps,
         validation_steps=n_validation_steps,
-        verbose=1, epochs=5, #it was 5 before
+        verbose=1, epochs=10, #it was 5 before
         callbacks=callbacks
     )
 
@@ -92,7 +92,7 @@ def train_model(model, num_examples):
     STORAGE_LOCATION = 'SavedModel'
 
     # save directly to gcp
-    STORAGE_LOCATION = 'SavedModel/test_RGB_1epoch_save_with_tensorflow'
+    STORAGE_LOCATION = 'SavedModel/Model_RGB_10epochs_16batch_'
     tf.saved_model.save(model, f'gs://wagon-data-batch913-drought_detection/{STORAGE_LOCATION}')
     print(f"uploaded model.joblib to gcp cloud storage under \n => {STORAGE_LOCATION}")
     print("===========================saved model========================")
@@ -140,11 +140,11 @@ def evaluate_model(model_path, num_examples):
 
 if __name__ == '__main__':
     # Load data
-    train_ds, test_ds, valid_ds, num_examples, num_classes = load_dataset(bands=['B4','B5','B1'])
+    train_ds, test_ds, valid_ds, num_examples, num_classes = load_dataset(bands=['B4','B3','B2'])
 
     print("=======================Load dataset=======================")
 
-    batch_size = 64 #should be 64
+    batch_size = 16 #should be 64
 
     train_ds = prepare_for_training(train_ds, num_classes, batch_size=batch_size)
 
