@@ -110,6 +110,23 @@ with tab1:
 
 with tab2:
     st.header("Under the hood")
+    st.write("**Problem/Opportunity**")
+    st.write("When it comes to droughts, Index insurance companies rely on models to predict average losses in a region and provide farmers with cash when losses reach a certain threshold.")
+    st.write("Can these models be improved upon to better predict drought conditions, with the end goal being a more effective cash transfer to the impacted farmers ?")
+    image1 = Image.open('images/green.jpg')
+    st.image(image1)
+    \
+    st.write("**Solution**")
+    st.write("We propose an improved version of an existing model, increasing its drought prediction accuracy by x%. We leverage our model in an app [...]")
+
+    st.subheader('What is our model based on?')
+    st.write("**Efficientnet Architecture**")
+    image2 = Image.open('images/EfficientNet.png')
+    st.image(image2)
+    st.write("A Convolutional Neural Network (ConvNet/CNN) is a Deep Learning algorithm which can take in an input image, assign importance (learnable weights and biases) to various aspects/objects in the image and be able to differentiate one from the other.")
+    st.write("In our project of Drought Detection, we have use CNN based on an EfficientNet algorithm. EfficientNet is a convolutional neural network architecture and scaling method that uniformly scales all dimensions of depth/width/resolution using a compound coefficient. It has been shown that in terms of accuracy it is the most optimal and also, it does not take as much parameters as other algorithms such as ResNet, SENet, NASNet-A  and AmoebaNet-C.")
+
+
 
 
 with tab3:

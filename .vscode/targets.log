@@ -6,14 +6,12 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-
-# Make data base, printed on Thu Jul 14 14:25:36 2022
-
+# Make data base, printed on Tue Jul 19 14:41:03 2022
 
 # Variables
 
-# makefile (from 'Makefile', line 76)
-FILENAME = Satellite_Images_EfficientNet
+# makefile (from 'Makefile', line 77)
+FILENAME = trainer
 # automatic
 <D = $(patsubst %/,%,$(dir $<))
 # automatic
@@ -34,11 +32,11 @@ HOMEBREW_NO_ANALYTICS = 1
 CURDIR := /home/lluismorey/code/helyne/drought_detection
 # makefile
 SHELL = /bin/sh
-# makefile (from 'Makefile', line 95)
+# makefile (from 'Makefile', line 96)
 LOCAL_PATH = "./drought_detection/data/tmp.csv"
 # environment
 VSCODE_NLS_CONFIG = {"locale":"en","availableLanguages":{}}
-# makefile (from 'Makefile', line 102)
+# makefile (from 'Makefile', line 103)
 BUCKET_FILE_NAME = $(shell basename ${LOCAL_PATH})
 # environment
 _ = /mnt/c/Users/heyll/AppData/Local/Programs/Microsoft VS Code/bin/code
@@ -51,31 +49,29 @@ GNUMAKEFLAGS :=
 # makefile (from 'Makefile', line 47)
 PYPI_USERNAME = <AUTHOR>
 # environment
-
 VSCODE_CWD = /mnt/c/Users/heyll/AppData/Local/Programs/Microsoft VS Code
 # default
 MAKE_HOST := x86_64-pc-linux-gnu
-
 # environment
-PATH = /home/lluismorey/.vscode-server/bin/b06ae3b2d2dbfe28bca3134cc6be65935cdfea6a/bin/remote-cli:./bin:./node_modules/.bin:/home/lluismorey/.pyenv/plugins/pyenv-virtualenv/shims:/home/lluismorey/.pyenv/shims:/home/lluismorey/.rbenv/bin:/home/lluismorey/.pyenv/plugins/pyenv-virtualenv/shims:/home/lluismorey/.pyenv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Program Files (x86)/Intel/Intel(R) Management Engine Components/iCLS/:/mnt/c/Program Files/Intel/Intel(R) Management Engine Components/iCLS/:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files (x86)/Intel/Intel(R) Management Engine Components/DAL:/mnt/c/Program Files/Intel/Intel(R) Management Engine Components/DAL:/mnt/c/Users/heyll/AppData/Roaming/nvm:/mnt/c/Program Files/nodejs:/mnt/c/Program Files/Java/jdk-13.0.2/bin:/mnt/c/Program Files/Git/cmd:/mnt/c/Program Files/Docker/Docker/resources/bin:/mnt/c/ProgramData/DockerDesktop/version-bin:/mnt/c/Users/heyll/AppData/Local/Programs/Python/Python38/Scripts/:/mnt/c/Users/heyll/AppData/Local/Programs/Python/Python38/:/mnt/c/Users/heyll/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/heyll/AppData/Local/Programs/Microsoft VS Code/bin:/usr/local/sbin
+PATH = /home/lluismorey/.vscode-server/bin/3b889b090b5ad5793f524b5d1d39fda662b96a2a/bin/remote-cli:./bin:./node_modules/.bin:/home/lluismorey/.pyenv/plugins/pyenv-virtualenv/shims:/home/lluismorey/.pyenv/shims:/home/lluismorey/.rbenv/bin:/home/lluismorey/.pyenv/plugins/pyenv-virtualenv/shims:/home/lluismorey/.pyenv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Program Files (x86)/Intel/Intel(R) Management Engine Components/iCLS/:/mnt/c/Program Files/Intel/Intel(R) Management Engine Components/iCLS/:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files (x86)/Intel/Intel(R) Management Engine Components/DAL:/mnt/c/Program Files/Intel/Intel(R) Management Engine Components/DAL:/mnt/c/Users/heyll/AppData/Roaming/nvm:/mnt/c/Program Files/nodejs:/mnt/c/Program Files/Java/jdk-13.0.2/bin:/mnt/c/Program Files/Git/cmd:/mnt/c/Program Files/Docker/Docker/resources/bin:/mnt/c/ProgramData/DockerDesktop/version-bin:/mnt/c/Users/heyll/AppData/Local/Programs/Python/Python38/Scripts/:/mnt/c/Users/heyll/AppData/Local/Programs/Python/Python38/:/mnt/c/Users/heyll/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/heyll/AppData/Local/Programs/Microsoft VS Code/bin:/usr/local/sbin
 # environment
 LSCOLORS = Gxfxcxdxbxegedabagacad
 # environment
 VIRTUAL_ENV = /home/lluismorey/.pyenv/versions/3.8.12/envs/drought_detection
-# makefile (from 'Makefile', line 80)
+# makefile (from 'Makefile', line 81)
 RUNTIME_VERSION = 2.8
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # environment
 PYENV_ROOT = /home/lluismorey/.pyenv
 # environment
-VSCODE_IPC_HOOK_CLI = /tmp/vscode-ipc-aa4380ab-4edc-45e6-a9d2-24c95ee2b1da.sock
+VSCODE_IPC_HOOK_CLI = /tmp/vscode-ipc-c752abe5-07c4-4fd8-a90d-324710932a34.sock
 # default
 .FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync check-symlink load
 # environment
 LS_COLORS = rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:
 # environment
-SSH_AUTH_SOCK = /tmp/ssh-DldJJiY3Dy8A/agent.363
+SSH_AUTH_SOCK = /tmp/ssh-ciON20o3R2LR/agent.372
 # automatic
 %F = $(notdir $%)
 # environment
@@ -83,11 +79,11 @@ PWD = /home/lluismorey/code/helyne/drought_detection
 # default
 .LOADED := 
 # environment
-SSH_AGENT_PID = 365
+SSH_AGENT_PID = 374
 # environment
-WSL_INTEROP = /run/WSL/25342_interop
+WSL_INTEROP = /run/WSL/5939_interop
 # environment
-WT_SESSION = 5b484ddf-3520-4d5c-aa98-259f0fce72eb
+WT_SESSION = 65d2c3bb-8193-4c0e-9d30-dd97722ce95d
 # environment
 VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
 # environment
@@ -126,7 +122,7 @@ NAME = Code
 LESS = -R
 # automatic
 %D = $(patsubst %/,%,$(dir $%))
-# makefile (from 'Makefile', line 78)
+# makefile (from 'Makefile', line 79)
 PYTHON_VERSION = 3.7
 # environment
 VSCODE_WSL_EXT_LOCATION = /mnt/c/Users/heyll/.vscode/extensions/ms-vscode-remote.remote-wsl-0.66.3
@@ -147,22 +143,20 @@ MFLAGS = -pqrR
 # automatic
 *D = $(patsubst %/,%,$(dir $*))
 # environment
-
 NVM_DIR = /home/lluismorey/.nvm
-
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
-# makefile (from 'Makefile', line 99)
+# makefile (from 'Makefile', line 100)
 BUCKET_FOLDER = data
 # automatic
 +F = $(notdir $+)
 # makefile (from 'Makefile', line 70)
-REGION = europe-west1
+REGION = europe-west4
 # makefile (from 'Makefile', line 67)
 BUCKET_NAME = wagon-data-batch913-drought_detection
 # environment
 VSCODE_HANDLES_SIGPIPE = true
-# makefile (from 'Makefile', line 75)
+# makefile (from 'Makefile', line 76)
 PACKAGE_NAME = drought_detection
 # environment
 WT_PROFILE_ID = {2c4de342-38b7-51cf-b940-2309a097f518}
@@ -170,7 +164,7 @@ WT_PROFILE_ID = {2c4de342-38b7-51cf-b940-2309a097f518}
 MAKEFILES := 
 # automatic
 <F = $(notdir $<)
-# makefile (from 'Makefile', line 79)
+# makefile (from 'Makefile', line 80)
 FRAMEWORK = scikit-learn
 # environment
 EDITOR = code
@@ -193,21 +187,21 @@ PROJECT_ID = drought-detection
 # environment
 PYENV_VIRTUALENV_INIT = 1
 # default
-
 .INCLUDE_DIRS = /usr/include /usr/local/include /usr/include
-# makefile (from 'Makefile', line 73)
-JOB_NAME = Satellite_Images_EfficientNet_$(shell date +'%Y%m%d_%H%M%S')
+# makefile (from 'Makefile', line 74)
+JOB_NAME = tmp_pat_hel_model_save_$(shell date +'%Y%m%d_%H%M%S')
 # default
 .RECIPEPREFIX := 
-
 # environment
 LANG = C
 # environment
 TERM = xterm-256color
+# makefile (from 'Makefile', line 104)
+BUCKET_TRAINING_FOLDER = SavedModel
 # environment
 WSL_DISTRO_NAME = Ubuntu
 # variable set hash-table stats:
-# Load=94/1024=9%, Rehash=0, Collisions=6/122=5%
+# Load=95/1024=9%, Rehash=0, Collisions=6/123=5%
 
 # Pattern-specific Variable Values
 
@@ -215,9 +209,9 @@ WSL_DISTRO_NAME = Ubuntu
 
 # Directories
 
-# . (device 2064, inode 243432): 20 files, no impossibilities.
+# . (device 2064, inode 243432): 21 files, no impossibilities.
 
-# 20 files, no impossibilities in 1 directories.
+# 21 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -264,7 +258,7 @@ pypi:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-07-14 12:39:39.006113
+#  Last modified 2022-07-19 12:42:52.602804
 #  File has been updated.
 #  Successfully updated.
 
@@ -280,7 +274,7 @@ gcp_submit_training:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 114):
+#  recipe to execute (from 'Makefile', line 116):
 	gcloud ai-platform jobs submit training ${JOB_NAME} \
 		--job-dir gs://${BUCKET_NAME}/${BUCKET_TRAINING_FOLDER} \
 		--package-path ${PACKAGE_NAME} \
@@ -288,13 +282,14 @@ gcp_submit_training:
 		--python-version=${PYTHON_VERSION} \
 		--runtime-version=${RUNTIME_VERSION} \
 		--region ${REGION} \
+		--scale-tier BASIC_TPU \
 		--stream-logs
 
- 
 build:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
+ 
 #  recipe to execute (from 'Makefile', line 49):
 	@python setup.py sdist bdist_wheel
 
@@ -302,14 +297,14 @@ upload_data:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 107):
+#  recipe to execute (from 'Makefile', line 109):
 	@gsutil cp ${LOCAL_PATH} gs://${BUCKET_NAME}/${BUCKET_FOLDER}
 
 set_project:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 84):
+#  recipe to execute (from 'Makefile', line 85):
 	@gcloud config set project ${PROJECT_ID}
 
 check_code:
@@ -344,7 +339,7 @@ create_bucket:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 87):
+#  recipe to execute (from 'Makefile', line 88):
 	@gsutil mb -l ${REGION} -p ${PROJECT_ID} gs://${BUCKET_NAME}
 
 clean:
@@ -383,7 +378,7 @@ streamlit:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 111):
+#  recipe to execute (from 'Makefile', line 113):
 	-@streamlit run app.py
 
 ftest:
@@ -404,9 +399,7 @@ install:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-
 #  recipe to execute (from 'Makefile', line 29):
-
 	@pip install . -U
 
 # files hash-table stats:
@@ -417,14 +410,12 @@ install:
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 41 / storage = 396 B / avg = 9 B
-# current buf: size = 8162 B / used = 396 B / count = 41 / avg = 9 B
+# strcache buffers: 1 (0) / strings = 42 / storage = 407 B / avg = 9 B
+# current buf: size = 8162 B / used = 407 B / count = 42 / avg = 9 B
 
-
-# strcache performance: lookups = 69 / hit rate = 40%
+# strcache performance: lookups = 70 / hit rate = 40%
 # hash-table stats:
-# Load=41/8192=1%, Rehash=0, Collisions=1/69=1%
-# Finished Make data base on Thu Jul 14 14:25:36 2022
-
+# Load=42/8192=1%, Rehash=0, Collisions=1/70=1%
+# Finished Make data base on Tue Jul 19 14:41:03 2022
 
  
