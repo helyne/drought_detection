@@ -1,4 +1,5 @@
 import os
+
 import numpy as np
 from sklearn.metrics import f1_score
 import tensorflow as tf
@@ -39,7 +40,9 @@ def initialize_model(num_classes):
     model_url = "https://tfhub.dev/google/imagenet/efficientnet_v2_imagenet1k_l/feature_vector/2"
 
     # download & load the layer as a feature vector
-    keras_layer = hub.KerasLayer(model_url, output_shape=[1280], trainable=True)
+
+    keras_layer = hub.KerasLayer(model_url, output_shape=[1280], trainable=False)
+
 
     model = tf.keras.Sequential([
         keras_layer,
@@ -84,17 +87,16 @@ def train_model(model, num_examples):
         train_ds, validation_data=valid_ds,
         steps_per_epoch=n_training_steps,
         validation_steps=n_validation_steps,
-        verbose=1, epochs=10, #it was 5 before
+        verbose=1, epochs=50, #it was 5 before
         callbacks=callbacks
     )
 
     # set storage location in cloud
-    STORAGE_LOCATION = 'SavedModel'
+    STORAGE_LOCATION = 'SavedModel/RGB_50epo_8batch_fullset_trainFalse_ps'
 
     # save directly to gcp
-    STORAGE_LOCATION = 'SavedModel/Model_RGB_10epochs_16batch_'
-    tf.saved_model.save(model, f'gs://wagon-data-batch913-drought_detection/{STORAGE_LOCATION}')
-    print(f"uploaded model.joblib to gcp cloud storage under \n => {STORAGE_LOCATION}")
+    model.save(f'gs://wagon-data-batch913-drought_detection/{STORAGE_LOCATION}')
+    print(f"uploaded model to gcp cloud storage under \n => {STORAGE_LOCATION}")
     print("===========================saved model========================")
     return history, model_path, weights_file
 
