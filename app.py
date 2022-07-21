@@ -13,7 +13,7 @@ from google.cloud import storage
 
 # Create API client.
 credentials = service_account.Credentials.from_service_account_info(
-    st.secrets["drought_detection_service_account"]
+    st.secrets["gcp_service_account"]
 )
 client = storage.Client(credentials=credentials)
 
@@ -26,7 +26,7 @@ def read_file(bucket_name, file_path):
     return content
 
 bucket_name = "wagon-data-batch913-drought_detection"
-file_path = "SavedModel/Model_3band_RGB_ha/saved_model.pb"
+file_path = "SavedModel/Model_3band_RGB_ha/"
 
 content = read_file(bucket_name, file_path)
 
