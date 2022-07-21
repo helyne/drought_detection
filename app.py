@@ -10,8 +10,8 @@ import pandas as pd
 ################# MODEL #################
 
 # Load the model from the cloud
-# STORAGE_LOCATION = f'gs://wagon-data-batch913-drought_detection/SavedModel/Model_3band_RGB_ha' # GCP path
-STORAGE_LOCATION = "model_rgb_10epo_16batch_fullset" # local path
+STORAGE_LOCATION = f'gs://wagon-data-batch913-drought_detection/SavedModel/Model_3band_RGB_ha' # GCP path
+#STORAGE_LOCATION = "model_rgb_10epo_16batch_fullset" # local path
 
 # load model (cache so it only loads once and saves time)
 @st.cache
@@ -110,7 +110,7 @@ with tab2:
 
 
     st.write("**Solution**")
-    st.write("We propose an improved version of an existing model, increasing its drought prediction accuracy by x%. We leverage our model in an app [...]")
+    st.write("We propose an improved version of an existing model, increasing its drought prediction accuracy by 155%.")
 
     st.subheader('What is our model based on?')
     st.write("**Efficientnet Architecture**")
