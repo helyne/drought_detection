@@ -12,10 +12,10 @@ from google.cloud import storage
 ################# Streamlit Cloud requirements ################
 
 # Create API client.
-credentials = service_account.Credentials.from_service_account_info(
-    st.secrets["gcp_service_account"]
-)
-client = storage.Client(credentials=credentials)
+#credentials = service_account.Credentials.from_service_account_info(
+#    st.secrets["gcp_service_account"]
+#)
+#client = storage.Client(credentials=credentials)
 
 #bucket_name = "wagon-data-batch913-drought_detection"
 #file_path = "SavedModel/Model_3band_RGB_ha/"
@@ -31,11 +31,11 @@ client = storage.Client(credentials=credentials)
 #content = read_file(bucket_name, file_path)
 
 
-################# MODEL #################
+################# MODEL ##################
 
 # Load the model from the cloud
-STORAGE_LOCATION = f'gs://wagon-data-batch913-drought_detection/SavedModel/Model_3band_RGB_ha' # GCP path
-#STORAGE_LOCATION = "model_rgb_10epo_16batch_fullset" # local path
+#STORAGE_LOCATION = f'gs://wagon-data-batch913-drought_detection/SavedModel/Model_3band_RGB_ha' # GCP path
+STORAGE_LOCATION = "SavedModel/" # local path
 
 # load model (cache so it only loads once and saves time)
 @st.cache

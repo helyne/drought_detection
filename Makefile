@@ -71,7 +71,7 @@ REGION=europe-west4
 
 
 
-JOB_NAME=Model_RGB_10epochs_16batch_$(shell date +'%Y%m%d_%H%M%S')
+JOB_NAME=Clara_5epo_32batch_ps_$(shell date +'%Y%m%d_%H%M%S')
 
 PACKAGE_NAME=drought_detection
 FILENAME=trainer
