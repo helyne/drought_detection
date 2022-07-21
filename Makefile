@@ -71,10 +71,10 @@ REGION=europe-west4
 
 
 
-JOB_NAME=tmp_helyne_model_save_$(shell date +'%Y%m%d_%H%M%S')
+JOB_NAME=Model_RGB_10epochs_16batch_$(shell date +'%Y%m%d_%H%M%S')
 
 PACKAGE_NAME=drought_detection
-FILENAME=tmp_helyne_model_save
+FILENAME=trainer
 
 PYTHON_VERSION=3.7
 FRAMEWORK=scikit-learn
@@ -101,7 +101,7 @@ BUCKET_FOLDER=data
 
 # name for the uploaded file inside of the bucket (we choose not to rename the file that we upload)
 BUCKET_FILE_NAME=$(shell basename ${LOCAL_PATH})
-BUCKET_TRAINING_FOLDER = "SavedModel"
+BUCKET_TRAINING_FOLDER=SavedModel
 
 # "shortcut" to upload file to GCP using 'make' in terminal (in terminal: make upload_data)
 upload_data:
