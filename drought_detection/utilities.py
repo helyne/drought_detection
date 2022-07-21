@@ -7,7 +7,7 @@ from google.cloud import storage
 from termcolor import colored
 # imports from our parameters file
 from drought_detection.params import BUCKET_NAME, MODEL_NAME
-
+import plotly.express as px
 
 
 def get_img_from_example(parsed_example, feature, intensify=True):
@@ -55,6 +55,22 @@ def transform_user_img(image_uploaded):
 
     return image
 
+def make_fig(df, x, y):
+    fig = px.scatter(df, x, y,
+                        size=f"% Confidence", color='Number of cows',
+                        color_discrete_sequence=px.colors.qualitative.Vivid,
+                        hover_name=f"% Confidence", size_max=100)
+    fig.update_coloraxes(showscale=False)
+    full_fig = fig.update_layout(
+        plot_bgcolor='rgba(0, 0, 0, 0)',
+        title="Regional Drought Confidence",
+        xaxis_title="# of Cows",
+        yaxis_title="% Confidence",
+        font=dict(
+            family="Open Sans, verdana, arial, sans-serif",
+            size=15,
+            color="#7f7f7f"))
+    return full_fig
 
 ############################### Save functions ##################################
 

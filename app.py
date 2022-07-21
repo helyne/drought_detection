@@ -3,11 +3,12 @@ from PIL import Image
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.models import load_model
-from drought_detection.utilities import transform_user_img
+from drought_detection.utilities import transform_user_img, make_fig
 import pandas as pd
 # import cv2
 from google.oauth2 import service_account
 from google.cloud import storage
+import plotly.express as px
 
 ################# Streamlit Cloud requirements ################
 
@@ -35,7 +36,8 @@ from google.cloud import storage
 
 # Load the model from the cloud
 #STORAGE_LOCATION = f'gs://wagon-data-batch913-drought_detection/SavedModel/Model_3band_RGB_ha' # GCP path
-STORAGE_LOCATION = "SavedModel/" # local path
+# STORAGE_LOCATION = "SavedModel/" # local path
+STORAGE_LOCATION = "model" # local path
 
 # load model (cache so it only loads once and saves time)
 @st.cache
@@ -103,19 +105,30 @@ with tab1:
                 is healthy and can feed at least 3 cows per 20m area! Happy foraging!")
 
 
-        st.title("Here's the likelihood of your region being in drought (based off forage quality)")
+        st.title("Here's the likelihood of your region being in drought")
         # create cached function to create dataframe
         @st.cache
         def get_dataframe_data(prediction):
             df = pd.DataFrame(prediction.transpose())
             df[0] = (df[0] * 100).round(decimals = 2)
             df.reset_index(inplace=True)
-            df = df.rename(columns = {'index':'Classification (# cows the area can feed)', 0:f"% Likelihood"})
+            df = df.rename(columns = {'index':'Classification', 0:f"% Confidence"})
+            df['Number of cows'] = ['0 cows', '1 cow', '2 cows', '3+ cows']
             return df
         # get dataframe
         df = get_dataframe_data(prediction)
-        # show dataframe
-        st.table(df)
+
+        # # show dataframe
+        # st.table(df)
+
+        # set variables and make plot
+        x = df.iloc[:,2]
+        y = df.iloc[:,1]
+        fig = make_fig(df, x, y)
+
+        # display plot
+        st.plotly_chart(fig)
+
 
     st.header("Bibliography")
     st.write("Satellite-based Prediction of Forage Conditions for Livestock in Northern Kenya. https://doi.org/10.48550/arXiv.2004.04081")
