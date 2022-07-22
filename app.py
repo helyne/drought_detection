@@ -3,7 +3,7 @@ from PIL import Image
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.models import load_model
-from drought_detection.utilities import transform_user_img, make_fig
+from drought_detection.utilities import transform_user_img, make_fig, get_dataframe_data
 import pandas as pd
 # import cv2
 from google.oauth2 import service_account
@@ -37,7 +37,10 @@ import plotly.express as px
 # Load the model from the cloud
 #STORAGE_LOCATION = f'gs://wagon-data-batch913-drought_detection/SavedModel/Model_3band_RGB_ha' # GCP path
 # STORAGE_LOCATION = "SavedModel/" # local path
-STORAGE_LOCATION = "model" # local path
+# STORAGE_LOCATION = "/Users/helyne/code/helyne/Model_3band_RGB_ha" # not good
+# STORAGE_LOCATION = "/Users/helyne/code/helyne/RGB_50epo_8batch_fullset_ps" # not good, predicts 2 cows for desert
+# STORAGE_LOCATION = "/Users/helyne/code/helyne/Model_3band_RGB_50epoch_32batch_nochkpts_earlyst_ha" # not great, predicts 0 or 2 cows for desert
+STORAGE_LOCATION = "/Users/helyne/code/helyne/Model_RGB_10epochs" # ok at predicting drought, not good at predicting central park
 
 # load model (cache so it only loads once and saves time)
 @st.cache
@@ -96,30 +99,19 @@ with tab1:
                 from drought and there's not enough plant life in the area to feed any cows.")
         elif result == prediction[0][1]:
             st.warning("Drought risk :cow: :warning:  Looks like your region is at risk of drought. \
-                The forage quality can only feed one cow per 20m area.")
+                The forage quality can only feed one cow per 20sqm area.")
         elif result == prediction[0][2]:
             st.info("Possible drought risk :cow: :seedling: :cow: : Looks like your region is not \
-                suffering from a drought, however, it can likely only feed 2 cows per 20m area.")
+                suffering from a drought, however, it can likely only feed 2 cows per 20sqm area.")
         elif result == prediction[0][3]:
             st.success("No Drought :herb: :cow: :cow: :cow: :deciduous_tree:  : Looks like your region \
-                is healthy and can feed at least 3 cows per 20m area! Happy foraging!")
+                is healthy and can feed at least 3 cows per 20sqm area! Happy foraging!")
 
 
         st.title("Here's the likelihood of your region being in drought")
-        # create cached function to create dataframe
-        @st.cache
-        def get_dataframe_data(prediction):
-            df = pd.DataFrame(prediction.transpose())
-            df[0] = (df[0] * 100).round(decimals = 2)
-            df.reset_index(inplace=True)
-            df = df.rename(columns = {'index':'Classification', 0:f"% Confidence"})
-            df['Number of cows'] = ['0 cows', '1 cow', '2 cows', '3+ cows']
-            return df
+
         # get dataframe
         df = get_dataframe_data(prediction)
-
-        # # show dataframe
-        # st.table(df)
 
         # set variables and make plot
         x = df.iloc[:,2]
@@ -128,10 +120,6 @@ with tab1:
 
         # display plot
         st.plotly_chart(fig)
-
-
-    st.header("Bibliography")
-    st.write("Satellite-based Prediction of Forage Conditions for Livestock in Northern Kenya. https://doi.org/10.48550/arXiv.2004.04081")
 
 
 
@@ -157,6 +145,9 @@ with tab2:
     st.write("In our project of Drought Detection, we have use CNN based on an EfficientNet algorithm. EfficientNet is a convolutional neural network architecture and scaling method that uniformly scales all dimensions of depth/width/resolution using a compound coefficient. It has been shown that in terms of accuracy it is the most optimal and also, it does not take as much parameters as other algorithms such as ResNet, SENet, NASNet-A  and AmoebaNet-C.")
 
 
+
+    st.header("Bibliography")
+    st.write("Satellite-based Prediction of Forage Conditions for Livestock in Northern Kenya. https://doi.org/10.48550/arXiv.2004.04081")
 
 
 
