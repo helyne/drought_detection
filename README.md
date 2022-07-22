@@ -4,7 +4,6 @@
 - Data Source: https://wandb.ai/wandb/droughtwatch/benchmark
 - Type of analysis: Deep learning CNN multi-class image classification
 
-Please document the project the better you can.
 
 # Startup the project
 
@@ -22,15 +21,15 @@ Unittest test:
 make clean install test
 ```
 
-Check for drought_detection in gitlab.com/{group}.
+Check for drought_detection in gitlab.com/helyne.
 If your project is not set please add it:
 
-- Create a new project on `gitlab.com/{group}/drought_detection`
+- Create a new project on `gitlab.com/helyne/drought_detection`
 - Then populate it:
 
 ```bash
-##   e.g. if group is "{group}" and project_name is "drought_detection"
-git remote add origin git@github.com:{group}/drought_detection.git
+##   e.g. if group is "helyne" and project_name is "drought_detection"
+git remote add origin git@github.com:helyne/drought_detection.git
 git push -u origin master
 git push -u origin --tags
 ```
@@ -46,7 +45,7 @@ drought_detection-run
 
 # Install
 
-Go to `https://github.com/{group}/drought_detection` to see the project, manage issues,
+Go to `https://github.com/helyne/drought_detection` to see the project, manage issues,
 setup you ssh public key, ...
 
 Create a python3 virtualenv and activate it:
@@ -59,7 +58,7 @@ deactivate; virtualenv -ppython3 ~/venv ; source ~/venv/bin/activate
 Clone the project and install it:
 
 ```bash
-git clone git@github.com:{group}/drought_detection.git
+git clone git@github.com:helyne/drought_detection.git
 cd drought_detection
 pip install -r requirements.txt
 make clean install test                # install and test
