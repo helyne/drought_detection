@@ -55,21 +55,40 @@ def transform_user_img(image_uploaded):
 
     return image
 
+def get_dataframe_data(prediction):
+    df = pd.DataFrame(prediction.transpose())
+    df[0] = (df[0] * 100)
+    df[0] = df[0].astype(int)
+    df.reset_index(inplace=True)
+    df = df.rename(columns = {'index':'Classification', 0:f"% Confidence"})
+    df['Number of cows'] = ['0 cows', '1 cow', '2 cows', '3 cows or more']
+    df['Percent'] = df[f"% Confidence"].astype(str)
+    df['Percent'] = df['Percent'].map(lambda x: x + ' %')
+    df['Drought Severity'] = ['Drought: Very Severe', 'Drought: Severe', 'Drought: Likely', 'Drought: Unlikely']
+    return df
+
 def make_fig(df, x, y):
     fig = px.scatter(df, x, y,
                         size=f"% Confidence", color='Number of cows',
-                        color_discrete_sequence=px.colors.qualitative.Vivid,
-                        hover_name=f"% Confidence", size_max=100)
+                        # color_discrete_sequence=px.colors.qualitative.Vivid,
+                        color_discrete_sequence=['#FF0D0D', '#E95302', '#FFBF00', '#238823'],
+                        hover_name='Drought Severity', size_max=50)
     fig.update_coloraxes(showscale=False)
+    fig.update_yaxes(range=[-10, 119])
     full_fig = fig.update_layout(
-        plot_bgcolor='rgba(0, 0, 0, 0)',
-        title="Regional Drought Confidence",
-        xaxis_title="# of Cows",
+        title={
+        'text': "Local Drought Assessment",
+        'x':0.47,
+        'xanchor': 'center',
+        'yanchor': 'top'},
+        xaxis_title="Number of Cows",
         yaxis_title="% Confidence",
+        legend_title="Forage Quality",
+        plot_bgcolor='#FFFFFF',
         font=dict(
             family="Open Sans, verdana, arial, sans-serif",
             size=15,
-            color="#7f7f7f"))
+            color="#000000"))
     return full_fig
 
 ############################### Save functions ##################################
