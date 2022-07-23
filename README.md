@@ -20,24 +20,28 @@ The model was developed and trained using TensorFlow 2. We use CNNs based on an 
 
 # Webapp
 
-On the homepage you can upload an image from your device or directly drag and drop an image:
+## On the homepage you can upload an image from your device or directly drag and drop an image:
 
 ![Drag and drop](images/Drag_and_drop.png "Employee Data title")
 
 
-you're then shown the image you've uploaded.
+
+## you're then shown the image you've uploaded:
 
 ![Selected image](images/Selected_image.png "Employee Data title")
 
 
-below this, you are then shown the prediction by the model:
+
+## below this, you are then shown the prediction by the model:
 
 ![Drought prediction](images/Drought_prediction.png "Employee Data title")
 
 
-and then below this, you then get a visual breakdown of drought risk:
+
+## and then below this, you then get a visual breakdown of drought risk:
 
 ![Drought assessment](images/Drought_assessment.png "Employee Data title")
+
 
 # Setup
 
