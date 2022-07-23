@@ -6,6 +6,21 @@ from google.cloud import storage
 # example file from gs bucket:
 # gs://wagon-data-batch913-drought_detection/data/train/part-r-00090
 
+# B1  30 meters   0.43 - 0.45 µm  Coastal aerosol
+# B2  30 meters   0.45 - 0.51 µm  Blue
+# B3  30 meters   0.53 - 0.59 µm  Green
+# B4  30 meters   0.64 - 0.67 µm  Red
+# B5  30 meters   0.85 - 0.88 µm  Near infrared
+# B6  30 meters   1.57 - 1.65 µm  Shortwave infrared 1
+# B7  30 meters   2.11 - 2.29 µm  Shortwave infrared 2
+# B8  15 meters   0.52 - 0.90 µm  Band 8 Panchromatic
+# B9  15 meters   1.36 - 1.38 µm  Cirrus
+# B10 30 meters   10.60 - 11.19 µm Thermal infrared 1, resampled from 100m to 30m
+# B11 30 meters   11.50 - 12.51 µm Thermal infrared 2, resampled from 100m to 30m
+
+# bands_list = [ 'B1', 'B4', 'B3', 'B2', 'B5', 'B6', 'B7', 'B8', 'B9', 'B10', 'B11']
+
+
 # list files in directory from google storage
 def dirlist(dataset='train'):
     '''list files in directory'''
@@ -59,7 +74,7 @@ def transform_sat_img(parsed_sat_file, bands, intensify=True):
     '''
     # convert to image array of numbers and label
     n_bands = len(bands) # number of of bands determines depth of imgArray
-    imgArray = np.zeros((65,65,n_bands), 'uint8') # create empty array
+    imgArray = np.zeros((65,65,n_bands), 'uint64') # create empty array
 
     # transform, reshape, and intensity-scale image data
     for i, band in enumerate(bands): # order of specified bands is important because that is the order they will be appended
@@ -76,30 +91,45 @@ def transform_sat_img(parsed_sat_file, bands, intensify=True):
     return imgArray, label
 
 
+############################ Composite Band Functions ####################################
+
+#Most up to date code for ARVI #LOAD B2, B4 AND B5 in this order!!
+def get_arvi(imgArray):
+    # swap axes (we needed to index into the list of lists)
+    swapped = imgArray.swapaxes(0,-1)
+    # make float (to do calculations)
+    cast_image = swapped.astype('float32')
+    # calculate composite band (e.g. here, GCI)
+    arvi = (cast_image[2] - (2 * cast_image[1]) + cast_image[0]) / (cast_image[2] + (2 *cast_image[1]) + cast_image[0])
+    return arvi
+
+
+#Most up to date code for NDVI #LOAD B4 AND B5 in this order!!
 def get_ndvi(imgArray):
-    '''
-    this function computes the ndvi image (2D array of 65x65 pixels)
-    from an satellite image FILE
-
-    Parameters:
-            image_file (path): filename of image (including path)
-
-    Returns:
-            ndvi (list): a 2D (65x65 pixels) arrays of values
-            label (int): label
-
-    '''
-    # Step 1-a: cast to float32 so we can do normal matrix computations (uint8 returns to 0 after 255)
-    swapped_img = imgArray.insert(0, imgArray.pop()) # moves last element to front (does not swap first and last, which messes up order)
-    cast_image = tf.cast(swapped_img, 'float32')
-
-    # Step 1-b: calculate composite band (e.g. NDVI)
-    ndvi_tmp = (cast_image[1] - cast_image[0]) / (cast_image[1] + cast_image[0])
-
-    # Step 1-d: correct swapped index
-    ndvi = ndvi_tmp[1:] + [ndvi_tmp[0]]
-
+    # swap axes (we needed to index into the list of lists)
+    swapped = imgArray.swapaxes(0,-1)
+    # make float (to do calculations)
+    cast_image = swapped.astype('float32')
+    # calculate composite band (e.g. here, GCI)
+    ndvi = (cast_image[1] - cast_image[0]) / (cast_image[1] + cast_image[0])
     return ndvi
+
+#Most up to date code for GCI #LOAD B3 AND B5 in this order!!
+def get_gci(imgArray):
+    # swap axes (we needed to index into the list of lists)
+    swapped = imgArray.swapaxes(0,-1)
+    # make float (to do calculations)
+    cast_image = swapped.astype('float32')
+    # calculate composite band (e.g. here, GCI)
+    gci = (cast_image[1]/cast_image[0])-1
+    return gci
+
+# Stack 1-dimension GCI array and 2 empty dimensions to match the model input format requirements
+def dummy_dim(input=None, dummy_1=np.zeros((65,65)), dummy_2=np.zeros((65,65))):
+    return np.dstack([input, dummy_1, dummy_2])
+
+##########################################################################################
+
 
 # function to load single file (can be from 'gs:://BUCKET')
 def load_single_img(image_file='../raw_data/train/part-r-00090', bands=['B4', 'B3', 'B2'], intensify=True):
@@ -110,36 +140,51 @@ def load_single_img(image_file='../raw_data/train/part-r-00090', bands=['B4', 'B
 
 
 # function to load a set of files from a directory
-def load_imgs(n_files, bands=['B4', 'B3', 'B2'], intensify=True, dataset='train', add_ndvi=False):
+def load_imgs(n_files, bands=['B4', 'B3', 'B2'], intensify=True, dataset='train', composite=''):
     '''
     This function creates a list of 3D imgArrays and a list of corresponding labels for
     a set of satellite image files in a specific folder
 
     Parameters:
-            dataset (string): one of: 'train' | 'val' | 'test'
             n_files (int): number of files to parse and transform, max 319(train), 81(val), or 100(test)
             bands (list): list of bands to process (order is important!)
             intensify (bool): whether to scale or not (affects how bright plotted image looks(?))
-
+            dataset (string): one of: 'train' | 'val' | 'test'
+            composite (string): one of 'gci' | 'ndvi' | 'arvi'
     Returns:
             images (list): list of processed images (65x65 pixels each) in n-Dimensions (depends on number of bands chosen)
             labels (list): list of corresponding labels (as int32)
     '''
+
     filenames = []
     images = []
     labels = []
 
     filenames_suffix = dirlist(dataset)[0:n_files]
 
-    # list_ds = tf.data.Dataset.list_files('gs://wagon-data-batch913-drought_detection/data/val/*')
-
     for filename in filenames_suffix:
         file = f'gs://wagon-data-batch913-drought_detection/{filename}'
-        parsed_sat = read_sat_file(file, bands)
-        imgArray, label = transform_sat_img(parsed_sat, bands, intensify)
-        # ##### TO DO: ADD COMPOSITE BAND CALCULATIONS HERES #####
-        # if add_ndvi=True:
-        #     ndvi = get_ndvi(imgArray)
+        if composite == 'gci':
+            bands=['B3', 'B5']
+            parsed_sat = read_sat_file(file, bands)
+            imgArray, label = transform_sat_img(parsed_sat, bands, intensify)
+            gci_tmp = get_gci(imgArray)
+            imgArray = dummy_dim(gci_tmp)
+        elif composite == 'ndvi':
+            bands=['B4', 'B5']
+            parsed_sat = read_sat_file(file, bands)
+            imgArray, label = transform_sat_img(parsed_sat, bands, intensify)
+            tmp = get_ndvi(imgArray)
+            imgArray = dummy_dim(tmp)
+        elif composite == 'arvi':
+            bands = ['B2', 'B4', 'B5']
+            parsed_sat = read_sat_file(file, bands)
+            imgArray, label = transform_sat_img(parsed_sat, bands, intensify)
+            tmp = get_arvi(imgArray)
+            imgArray = dummy_dim(tmp)
+        else:
+            parsed_sat = read_sat_file(file, bands)
+            imgArray, label = transform_sat_img(parsed_sat, bands, intensify)
         filenames.append(file)
         images.append(imgArray)
         labels.append(label)
@@ -161,9 +206,6 @@ def make_prefetch_dataset(filenames, images, labels):
                 <PrefetchDataset shapes: {filename: (), image: (65, 65, 3), label: ()},
                 types: {filename: tf.string, image: tf.uint8, label: tf.int64}>
     '''
-    # # convert labels to correct type
-    # labels = np.array(labels)
-    # labels = labels.astype('int64')
 
     # create Dataset from data
     dataset = tf.data.Dataset.from_tensor_slices({'filename': filenames,
@@ -180,7 +222,7 @@ def make_prefetch_dataset(filenames, images, labels):
 
 # final function to load data (read, convert, transform)
 def load_dataset(train_n=319, val_n=81, test_n=100,
-                 bands=['B4', 'B3', 'B2'], intensify=True):
+                 bands=['B4', 'B3', 'B2'], intensify=True, composite=''):
     '''
     This function loads train, validation, and test datasets from GCP
 
@@ -198,17 +240,17 @@ def load_dataset(train_n=319, val_n=81, test_n=100,
     '''
     print("=====================================loading train========================================")
     # train data
-    filenames, images, labels = load_imgs(train_n, bands, intensify, dataset='train')
+    filenames, images, labels = load_imgs(train_n, bands, intensify, dataset='train_full', composite=composite)
     train_ds = make_prefetch_dataset(filenames, images, labels)
 
     print("===================================loading validation=====================================")
     # validation data set (data to help create metrics)
-    filenames_v, images_v, labels_v = load_imgs(val_n, bands, intensify, dataset='val')
+    filenames_v, images_v, labels_v = load_imgs(val_n, bands, intensify, dataset='val', composite=composite)
     valid_ds = make_prefetch_dataset(filenames_v, images_v, labels_v)
 
     print("=====================================loading test========================================")
     # test data (data you DO NOT TOUCH! :P)
-    filenames_t, images_t, labels_t = load_imgs(test_n, bands, intensify, dataset='test')
+    filenames_t, images_t, labels_t = load_imgs(test_n, bands, intensify, dataset='test', composite=composite)
     test_ds = make_prefetch_dataset(filenames_t, images_t, labels_t)
 
     # total number of classes (4 in our case)
@@ -219,9 +261,14 @@ def load_dataset(train_n=319, val_n=81, test_n=100,
     return train_ds, test_ds, valid_ds, num_examples, num_classes
 
 
-
 if __name__ == '__main__':
-    # Load data
-    train_ds, test_ds, valid_ds, num_examples, num_classes = load_dataset()
+    print("=======================Load dataset=======================")
+    train_ds, test_ds, valid_ds, num_examples, num_classes = load_dataset(train_n=1, val_n=1, test_n=1,
+                                                                          bands=['B2', 'B3', 'B4'])
+    print(train_ds.take(1))
 
-    print(num_classes)
+    # batch_size = 64 #should be 64
+    # train_ds = prepare_for_training(train_ds, num_classes, batch_size=batch_size)
+    # valid_ds = prepare_for_training(valid_ds, num_classes, batch_size=batch_size)
+    # data_shape = list(train_ds.take(1).element_spec[0].shape)
+    # print(data_shape)
