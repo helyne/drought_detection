@@ -8,7 +8,7 @@ import tensorflow_hub as hub
 import tensorflow_addons as tfa
 # import datetime
 
-from drought_detection.data_handling import load_dataset
+from drought_detection.data import load_dataset
 from google.cloud import storage
 import joblib
 

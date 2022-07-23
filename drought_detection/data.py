@@ -198,7 +198,7 @@ def load_dataset(train_n=319, val_n=81, test_n=100,
     '''
     print("=====================================loading train========================================")
     # train data
-    filenames, images, labels = load_imgs(train_n, bands, intensify, dataset='train')
+    filenames, images, labels = load_imgs(train_n, bands, intensify, dataset='train_full')
     train_ds = make_prefetch_dataset(filenames, images, labels)
 
     print("===================================loading validation=====================================")
