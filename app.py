@@ -35,12 +35,8 @@ import plotly.express as px
 ################# MODEL ##################
 
 # Load the model from the cloud
-#STORAGE_LOCATION = f'gs://wagon-data-batch913-drought_detection/SavedModel/Model_3band_RGB_ha' # GCP path
-# STORAGE_LOCATION = "SavedModel/" # local path
-# STORAGE_LOCATION = "/Users/helyne/code/helyne/Model_3band_RGB_ha" # not good
-# STORAGE_LOCATION = "/Users/helyne/code/helyne/RGB_50epo_8batch_fullset_ps" # not good, predicts 2 cows for desert
-# STORAGE_LOCATION = "/Users/helyne/code/helyne/Model_3band_RGB_50epoch_32batch_nochkpts_earlyst_ha" # not great, predicts 0 or 2 cows for desert
-STORAGE_LOCATION = "/Users/helyne/code/helyne/Model_RGB_10epochs" # ok at predicting drought, not good at predicting central park
+STORAGE_LOCATION = f'gs://wagon-data-batch913-drought_detection/SavedModel/Model_3band_RGB_ha' # GCP path
+
 
 # load model (cache so it only loads once and saves time)
 @st.cache
