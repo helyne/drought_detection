@@ -43,27 +43,6 @@ The model was developed and trained using TensorFlow 2. We use CNNs based on an 
 ![Drought assessment](images/Drought_assessment.png "Employee Data title")
 
 
-# Setup
-
-Create a python3 virtualenv and activate it (OPTIONAL):
-
-```bash
-sudo apt-get install virtualenv python-pip python-dev
-deactivate; virtualenv -ppython3 ~/venv ; source ~/venv/bin/activate
-```
-
-Clone the project:
-
-```bash
-git clone git@github.com:helyne/drought_detection.git
-cd drought_detection
-```
-
-and install it:
-```bash
-pip install -r requirements.txt
-make clean install test                # install and test
-```
 
 # Additional material and references
 
