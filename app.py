@@ -147,36 +147,6 @@ with tab2:
 
 
 
-# with tab3:
-#     columns = st.columns(2)
-#     image = Image.open('images/Helyne.png')
-#     columns[0].image(image, use_column_width=True)
-#     columns[1].write("**Helyne Adamson**")
-#     columns[1].write("I'm a cognitive science researcher and general neuroscience enthusiast. In my recent work, I used diffusion MRI methods to analyze neuroanatomical brain changes during foreign language learning in adults.")
-#     columns[1].write("*Linkedin page*: https://www.linkedin.com/in/helyne-adamson-1587939/?originalSubdomain=de")
-
-#     columns = st.columns(2)
-#     image = Image.open('images/Lluis.png')
-#     columns[0].image(image, use_column_width=True)
-#     columns[1].write("**Lluis Morey**")
-#     columns[1].write("Hello, my name is Lluis Morey and I am 22 years old. I am from Spain, more particularly from the island of Mallorca. I am currently in my third year of Business Management. Since I started at university I have been very interested in the world of technology. Data Science is deeply connected to decision making at a business level, this is what caught my interest. I would love to work as a data scientist after Le Wagon.")
-#     columns[1].write("*Linkedin page*: https://www.linkedin.com/in/lluismorey/")
-
-#     columns = st.columns(2)
-#     image = Image.open('images/Marie.png')
-#     columns[0].image(image, use_column_width=True)
-#     columns[1].write("**Marie-Laure Geai**")
-#     columns[1].write("""I am a Geographic Information Systems analyst (cartographer): I work with spatial data. My niche area of interest is 3D mapping of alpine areas using various imagery sources for hazard monitoring (or ideally, for outdoor practices!)""")
-#     columns[1].write("*Linkedin page*: https://www.linkedin.com/in/mariegeai/")
-
-#     columns = st.columns(2)
-#     image = Image.open('images/Patricia.png')
-#     columns[0].image(image, use_column_width=True)
-#     columns[1].write("**Patricia Regina Soares de Souza**")
-#     columns[1].write("I am a Senior Research Scientist with a doctoral degree in Immunopharmacology. After years working in a lab generating data, I have become interested in working with the data I have generated in a more powerful way.")
-#     columns[1].write("*Linkedin page*: https://www.linkedin.com/in/patricia-regina-soares-de-souza-2b7a7042/")
-
-
 with tab3:
     col1, col2 = st.columns([1, 3])
     col1.image('images/Helyne.png', use_column_width=True)
