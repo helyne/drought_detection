@@ -8,7 +8,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # This program built for i386-apple-darwin11.3.0
  
 
-# Make data base, printed on Tue Aug  2 17:57:15 2022
+# Make data base, printed on Sat Oct 29 13:11:59 2022
 
 # Variables
 
@@ -48,15 +48,18 @@ GOOGLE_APPLICATION_CREDENTIALS = /Users/helyne/code/helyne/JSON/drought-detectio
 MAKEFILE_LIST :=  Makefile
 # environment
 __CFBundleIdentifier = com.microsoft.VSCode
+# environment
+INFOPATH = /opt/homebrew/share/info:
 # makefile (from `Makefile', line 47)
 PYPI_USERNAME = <AUTHOR>
 # environment
 VSCODE_CWD = /Users/helyne/code/helyne/drought_detection
 # environment
-PATH = /usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/bin:./bin:./node_modules/.bin:/Users/helyne/.pyenv/plugins/pyenv-virtualenv/shims:/Users/helyne/.pyenv/shims:/Users/helyne/.rbenv/bin:/Users/helyne/.pyenv/plugins/pyenv-virtualenv/shims:/Users/helyne/.pyenv/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/sbin
+PATH = /Users/helyne/miniforge3/bin:/Users/helyne/miniforge3/condabin:/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/bin:bin:node_modules/.bin:/Users/helyne/.pyenv/plugins/pyenv-virtualenv/shims:/Users/helyne/.pyenv/shims:/Users/helyne/.rbenv/bin:/Users/helyne/.pyenv/plugins/pyenv-virtualenv/shims:/opt/homebrew/bin:/opt/homebrew/sbin:/Users/helyne/.pyenv/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/TeX/texbin:/usr/local/sbin
 # environment
 LSCOLORS = Gxfxcxdxbxegedabagacad
 # environment
+ 
 VIRTUAL_ENV = /Users/helyne/.pyenv/versions/3.8.12/envs/drought_detection
 # makefile (from `Makefile', line 81)
 RUNTIME_VERSION = 2.8
@@ -71,9 +74,15 @@ SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.lPqRwbushs/Listeners
 # automatic
 %F = $(notdir $%)
 # environment
+CONDA_EXE = /Users/helyne/miniforge3/bin/conda
+# environment
 PWD = /Users/helyne/code/helyne/drought_detection
 # environment
+HOMEBREW_CELLAR = /opt/homebrew/Cellar
+# environment
 ORIGINAL_XDG_CURRENT_DESKTOP = undefined
+# environment
+MANPATH = /opt/homebrew/share/man::
 # environment
 VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
 # environment
@@ -85,13 +94,15 @@ MAKEFILEPATH = $(shell /usr/bin/xcode-select -print-path 2>/dev/null || echo /De
 # environment
 VSCODE_CLI = 1
 # environment
-VSCODE_CODE_CACHE_PATH = /Users/helyne/Library/Application Support/Code/CachedData/3b889b090b5ad5793f524b5d1d39fda662b96a2a
+VSCODE_CODE_CACHE_PATH = /Users/helyne/Library/Application Support/Code/CachedData/d045a5eda657f4d7b676dedbfa7aab8207f8a075
 # environment
 LOGNAME = helyne
 # environment
 BUNDLER_EDITOR = code
 # environment
 APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
+# environment
+CONDA_PROMPT_MODIFIER = (base) 
 # environment
 PYTHONBREAKPOINT = ipdb.set_trace
 # environment
@@ -113,13 +124,15 @@ USER = helyne
 # makefile
 .DEFAULT_GOAL := install_requirements
 # environment
-TERM_SESSION_ID = AEF038EC-23D5-4753-B895-381583D65C61
+TERM_SESSION_ID = A0EB2E2D-46A3-4003-B21B-311B59B256A6
 # environment
 LESS = -R
 # automatic
 %D = $(patsubst %/,%,$(dir $%))
 # makefile (from `Makefile', line 79)
 PYTHON_VERSION = 3.7
+# environment
+CONDA_SHLVL = 1
 # default
 MAKE_COMMAND := /Library/Developer/CommandLineTools/usr/bin/make
 # environment
@@ -131,7 +144,7 @@ TMPDIR = /var/folders/q5/2d8pwqf14mv_nz14d23_2b040000gn/T/
 # automatic
 *F = $(notdir $*)
 # environment
-VSCODE_IPC_HOOK = /Users/helyne/Library/Application Support/Code/1.69.2-main.sock
+VSCODE_IPC_HOOK = /Users/helyne/Library/Application Support/Code/1.72.2-main.sock
 # environment
 MallocNanoZone = 0
 # makefile
@@ -145,7 +158,9 @@ TERM_PROGRAM_VERSION = 445
 # environment
 NVM_DIR = /Users/helyne/.nvm
 # environment
-XPC_SERVICE_NAME = application.com.microsoft.VSCode.6607755.6607761.3C294F73-F9A2-4471-9090-45FBED491A5A
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.14599489.14599495.2BAEBCD6-D794-42F9-A827-527E323530CE
+# environment
+HOMEBREW_PREFIX = /opt/homebrew
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
 # makefile (from `Makefile', line 100)
@@ -156,6 +171,8 @@ BUCKET_FOLDER = data
 REGION = europe-west4
 # makefile (from `Makefile', line 67)
 BUCKET_NAME = wagon-data-batch913-drought_detection
+# environment
+HOMEBREW_REPOSITORY = /opt/homebrew
 # makefile (from `Makefile', line 76)
 PACKAGE_NAME = drought_detection
 # environment
@@ -177,11 +194,15 @@ LC_ALL = C
 # environment
 PYENV_VIRTUALENV_DISABLE_PROMPT = 1
 # environment
+CONDA_PYTHON_EXE = /Users/helyne/miniforge3/bin/python
+# environment
 PYENV_VIRTUAL_ENV = /Users/helyne/.pyenv/versions/3.8.12/envs/drought_detection
 # automatic
 ^F = $(notdir $^)
 # default
 SUFFIXES := 
+# environment
+_CE_M = 
 # makefile (from `Makefile', line 64)
 PROJECT_ID = drought-detection
 # environment
@@ -193,15 +214,20 @@ JOB_NAME = Clara_5epo_32batch_ps_$(shell date +'%Y%m%d_%H%M%S')
 # environment
 MAKELEVEL := 0
 # environment
-LANG = C
+CONDA_PREFIX = /Users/helyne/miniforge3
 # environment
 TERM = xterm-256color
 # makefile (from `Makefile', line 104)
 BUCKET_TRAINING_FOLDER = SavedModel
 # environment
-VSCODE_PID = 81384
+VSCODE_PID = 13400
+# environment
+_CE_CONDA = 
+# environment
+LANG = C
 # variable set hash-table stats:
-# Load=94/1024=9%, Rehash=0, Collisions=3/120=2%
+ 
+# Load=106/1024=10%, Rehash=0, Collisions=4/132=3%
 
 # Pattern-specific Variable Values
 
@@ -223,6 +249,7 @@ black:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
+ 
 #  commands to execute (from `Makefile', line 11):
 	@black scripts/* drought_detection/*.py
 	
@@ -242,6 +269,7 @@ install_requirements:
 #  File has not been updated.
 #  commands to execute (from `Makefile', line 5):
 	@pip install -r requirements.txt
+ 
 	
 
 pypi:
@@ -261,7 +289,7 @@ pypi:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-08-02 17:56:57
+#  Last modified 2022-10-29 13:05:55
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -310,7 +338,6 @@ upload_data:
 
 set_project:
 #  Implicit rule search has not been done.
- 
 #  Modification time never checked.
 #  File has not been updated.
 #  commands to execute (from `Makefile', line 85):
@@ -426,6 +453,7 @@ install:
 
 # No `vpath' search paths.
 
+ 
 # No general (`VPATH' variable) search path.
 
 # # of strings in strcache: 1
@@ -433,6 +461,6 @@ install:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Tue Aug  2 17:57:15 2022
+# Finished Make data base on Sat Oct 29 13:11:59 2022
 
  
