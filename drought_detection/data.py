@@ -9,9 +9,7 @@
 # thinks the surrounding land could support (0, 1, 2, or 3+)
 
 
-import argparse
 import tensorflow as tf
-import tensorflow_addons as tfa
 from tensorflow.python.ops.numpy_ops import np_config
 np_config.enable_numpy_behavior() # for numpy calculations of composite bands
 tf.get_logger().setLevel('ERROR') # only show errors, not warnings
@@ -279,6 +277,4 @@ def load_dataset(data_path='data',
 
 
 if __name__ == "__main__":
-    train_dataset, val_dataset = load_dataset(batch_size=1, train_shuffle_size=1)
-    train_image, train_label = next(iter(train_dataset))
-    print(train_image, train_label)
+    train_dataset, val_dataset = load_dataset()

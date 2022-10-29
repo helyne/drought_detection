@@ -35,7 +35,7 @@ import plotly.express as px
 ################# MODEL ##################
 
 # Load the model from the cloud
-STORAGE_LOCATION = f'gs://wagon-data-batch913-drought_detection/SavedModel/Model_3band_RGB_ha' # GCP path
+STORAGE_LOCATION = f'gs://wagon-data-batch913-drought_detection/SavedModel/Model_3band_RGB' # GCP path
 
 
 # load model (cache so it only loads once and saves time)
