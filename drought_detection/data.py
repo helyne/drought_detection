@@ -1,11 +1,24 @@
-# python script that handles data (retrieved from the cloud)
-import numpy as np
+#!/usr/bin/env python3
+
+# keras_train.py
+# --------------------
+# Use Keras to train a simple CNN to predict a discrete
+# indicator of forage quality (inversely related to drought severity) from satellite
+# images in 10 frequency bands. The ground truth label is the number of
+# cows that a human expert standing at the center of the satellite image at ground level
+# thinks the surrounding land could support (0, 1, 2, or 3+)
+
+
+import argparse
 import tensorflow as tf
-from google.cloud import storage
+import tensorflow_addons as tfa
+from tensorflow.python.ops.numpy_ops import np_config
+np_config.enable_numpy_behavior() # for numpy calculations of composite bands
+tf.get_logger().setLevel('ERROR') # only show errors, not warnings
+tf.compat.v1.set_random_seed(89)
 
-# example file from gs bucket:
-# gs://wagon-data-batch913-drought_detection/data/train/part-r-00090
 
+# Band key:
 # B1  30 meters   0.43 - 0.45 µm  Coastal aerosol
 # B2  30 meters   0.45 - 0.51 µm  Blue
 # B3  30 meters   0.53 - 0.59 µm  Green
@@ -18,257 +31,254 @@ from google.cloud import storage
 # B10 30 meters   10.60 - 11.19 µm Thermal infrared 1, resampled from 100m to 30m
 # B11 30 meters   11.50 - 12.51 µm Thermal infrared 2, resampled from 100m to 30m
 
-# bands_list = [ 'B1', 'B4', 'B3', 'B2', 'B5', 'B6', 'B7', 'B8', 'B9', 'B10', 'B11']
+# adjustable settings/hyperparams
+# these defaults can be edited here
+INPUT_BANDS = ['all']   # input bands to use for training (composite, rgb, all, or custom list)
+NUM_BANDS = 11          # number of bands being used (all = 11, composite = 3, rgb = 3)
+DATA_PATH = "data"
+BATCH_SIZE = 64
 
 
-# list files in directory from google storage
-def dirlist(dataset='train'):
-    '''list files in directory'''
-    client = storage.Client()
-    bucket = client.bucket('wagon-data-batch913-drought_detection')
-    blobs = list(bucket.list_blobs(prefix=f'data/{dataset}/part'))
-    return [blob_.name for blob_ in blobs]
+# fixed variables (do not alter!)
+# for categorical classification, there are 4 classes: 0, 1, 2, or 3+ cows
+NUM_CLASSES = 4
+# fixed image counts from TFRecords
+NUM_TRAIN = 85056       # 86317 before filtering for null images
+NUM_VAL = 10626         # 10778 before filtering for null images
+# default image size resolution dimension (65 x 65 pixel square)
+IMG_DIM = 65
+# resizing resolution dimension is determined by EfficientNet model choice
+IMG_RESIZE = 224        # EfficientNetB0 = 224
+EFFICIENT_NET = 'b0'    # EfficientNet model
+# performance optimization parameter
+AUTOTUNE = tf.data.AUTOTUNE
 
 
-# function to read raw satellite file data
-def read_sat_file(image_file, bands):
+# raw file-loading
+#----------------------------------
+def load_files(data_path='data', local=True):
+    # gcp bucket: 'wagon-data-batch913-drought_detection/data'
+    if not local:
+        data_path = f'gs://{data_path}'
+
+    train_tfrecords = tf.data.Dataset.list_files(f"{data_path}/train/part*")
+    val_tfrecords = tf.data.Dataset.list_files(f"{data_path}/val/part*")
+    return train_tfrecords, val_tfrecords
+
+# band data decoding
+#----------------------------------
+def decode_band(example, band):
+    decoded_band = tf.io.decode_raw(example[band], tf.uint8)
+    reshaped_band = tf.reshape(decoded_band[:IMG_DIM**2],
+                            shape=(IMG_DIM, IMG_DIM, 1))
+    return reshaped_band
+
+def select_bands(example, list_of_bands = ['B4', 'B3', 'B2']):
+    # decode and reshape multi-band image
+    reshaped_bands = [decode_band(example, band) for band in list_of_bands]
+    # combine bands into tensor
+    example['image'] = tf.concat(reshaped_bands, -1)
+    return example
+
+def select_all_bands(example):
+    # declare bands
+    list_of_bands = ['B1', 'B2', 'B3', 'B4', 'B5', \
+        'B6', 'B7', 'B8', 'B9', 'B10', 'B11']
+    # decode and reshape multi-band image
+    reshaped_bands = [decode_band(example, band) for band in list_of_bands]
+    # combine bands into tensor
+    example['image'] = tf.concat(reshaped_bands, -1)
+    return example
+
+def select_rgb_bands(example):
+    # declare bands
+    list_of_bands = ['B4', 'B3', 'B2']
+    # decode and reshape multi-band image
+    reshaped_bands = [decode_band(example, band) for band in list_of_bands]
+    # combine bands into tensor
+    example['image'] = tf.concat(reshaped_bands, -1)
+    return example
+
+def compute_composites(example):
+    # declare base bands used for computations
+    bands = ['B2', 'B3', 'B4', 'B5']
+
+    # convert values to float (to be able to to computations)
+    values = [decode_band(example, band).astype('float32') for band in bands]
+    floated_bands = dict(zip(bands, values))
+
+    # compute ndvi
+    ndvi = (floated_bands['B5'] - floated_bands['B4']) / \
+        (floated_bands['B5'] + floated_bands['B4'])
+
+    # compute arvi
+    arvi = (floated_bands['B5'] - (2*floated_bands['B4']) + floated_bands['B2']) / \
+    (floated_bands['B5'] + (2*floated_bands['B4']) + floated_bands['B5'])
+
+    # compute gci
+    gci = (floated_bands['B5']/floated_bands['B3']) - 1
+
+    return [ndvi, arvi, gci]
+
+def select_composite_bands(example):
+    # compute composites
+    composites = compute_composites(example)
+    # combine composite bands into tensor
+    example['image'] = tf.concat(composites, -1)
+    return example
+
+# image resizing/augmentation
+#----------------------------------
+image_resize = tf.keras.Sequential(
+        [
+            tf.keras.layers.Resizing(IMG_RESIZE, IMG_RESIZE)
+        ],
+        name="resize_layer"
+    )
+
+image_augmentation = tf.keras.Sequential(
+        [
+            tf.keras.layers.RandomFlip("horizontal_and_vertical"),
+            tf.keras.layers.RandomRotation(0.2),
+            tf.keras.layers.RandomContrast(factor=0.1)
+        ],
+        name="augmentation_layer"
+    )
+
+# data parsing functions
+#----------------------------------
+def parse_tfrecord(unparsed_example):
+
+    # declare feature descriptions/types
+    feature_description = {
+        'B1': tf.io.FixedLenFeature([], tf.string),
+        'B2': tf.io.FixedLenFeature([], tf.string),
+        'B3': tf.io.FixedLenFeature([], tf.string),
+        'B4': tf.io.FixedLenFeature([], tf.string),
+        'B5': tf.io.FixedLenFeature([], tf.string),
+        'B6': tf.io.FixedLenFeature([], tf.string),
+        'B7': tf.io.FixedLenFeature([], tf.string),
+        'B8': tf.io.FixedLenFeature([], tf.string),
+        'B9': tf.io.FixedLenFeature([], tf.string),
+        'B10': tf.io.FixedLenFeature([], tf.string),
+        'B11': tf.io.FixedLenFeature([], tf.string),
+        'label': tf.io.FixedLenFeature([], tf.int64)
+        }
+
+    # parse example using feature descriptions
+    example = tf.io.parse_single_example(unparsed_example, feature_description)
+
+    return example
+
+def encode_label(example):
+    # one-hot encode label
+    example['label'] = tf.cast(example['label'], tf.int32)
+    example['label'] = tf.one_hot(example['label'], NUM_CLASSES)
+    return example
+
+def compute_empty(example):
+    # sum value of all bands
+    example['is_empty'] = tf.math.reduce_sum(example['image'])
+    return example
+
+def select_image_label(example):
+    return example['image'], example['label']
+
+
+# putting it all together
+#----------------------------------
+def get_dataset(tfrecords, input_bands):
     '''
-    This function filters satellite image data by specific spectral bands
-    The function loads a batch of satellite images from a list of files
-    and parses the satellite image data files for some specific spectral bands
-    (e.g. B2, B3, B4, see official documentation)
+    This function parses the TF Records, selects specific bands, encodes label,
+    removes null images, and returns a TFDataset of images and labels
 
     Parameters:
-            list of satellite image files (including path, e.g '/data/train/part-r-00000')
+            tfrecords (Dataset): Tensorflow ShuffleDataset of strings of file names
+            args (args): object of parsed arguments from the command line
     Returns:
-            list of dictionaries (tensors) of raw satellite data (filtered by spectral band)
-    '''
-    # make tfrecord format list for chosen bands
-    tfrecord_format = {}
-    for b in bands:
-        tfrecord_format[b] = tf.io.FixedLenFeature([], tf.string)
-    tfrecord_format['label'] = tf.io.FixedLenFeature([], tf.int64)
-
-    # load and parse one sat image
-    dataset = tf.data.TFRecordDataset(image_file)
-    iterator = iter(dataset)
-    parsed_sat_file = [tf.io.parse_single_example(data, tfrecord_format) for data in iterator]
-
-    return parsed_sat_file
-
-
-# function to convert a raw sat image (tensorflow object) to matrix of numbers & label (it also scales bands)
-def transform_sat_img(parsed_sat_file, bands, intensify=True):
-    '''
-    This function creates a 3D imgArray in shape 65 x 65 x n_bands (65x65 pixels) for
-    a single parsed satellite image, while also scaling each spectral band.
-
-    Parameters:
-            parsed_sat_img (dict): a parsed satellite image: Specific Tensorflow format (as dictionary)
-            bands (list): list of bands to process (order is important!)
-            intensify (bool): whether to scale or not (affects how bright plotted image looks(?))
-
-    Returns:
-            imgArray (tuple): tuple of processed images in n-Dimensional arrays (depends on number of bands chosen)
-            label (list): list of corresponding labels (as int32)
-    '''
-    # convert to image array of numbers and label
-    n_bands = len(bands) # number of of bands determines depth of imgArray
-    imgArray = np.zeros((65,65,n_bands), 'uint64') # create empty array
-
-    # transform, reshape, and intensity-scale image data
-    for i, band in enumerate(bands): # order of specified bands is important because that is the order they will be appended
-        band_data = tf.io.decode_raw(parsed_sat_file[0][band], tf.uint8) # transforms raw tensorflow data into 1D array
-        band_data = tf.reshape(band_data, [65,65]) # reshapes data into 65 x 65 pixel matrix
-        if intensify:
-            band_data = band_data/np.max(band_data)*255 # scaling digital numbers so image is slightly brighter
-        else:
-            band_data = band_data*255 # scaling digital numbers
-        imgArray[..., i] = band_data
-
-    label = tf.cast(parsed_sat_file[0]['label'], tf.int32).numpy() # gets label for image
-
-    return imgArray, label
-
-
-############################ Composite Band Functions ####################################
-
-#Most up to date code for ARVI #LOAD B2, B4 AND B5 in this order!!
-def get_arvi(imgArray):
-    # swap axes (we needed to index into the list of lists)
-    swapped = imgArray.swapaxes(0,-1)
-    # make float (to do calculations)
-    cast_image = swapped.astype('float32')
-    # calculate composite band (e.g. here, GCI)
-    arvi = (cast_image[2] - (2 * cast_image[1]) + cast_image[0]) / (cast_image[2] + (2 *cast_image[1]) + cast_image[0])
-    return arvi
-
-
-#Most up to date code for NDVI #LOAD B4 AND B5 in this order!!
-def get_ndvi(imgArray):
-    # swap axes (we needed to index into the list of lists)
-    swapped = imgArray.swapaxes(0,-1)
-    # make float (to do calculations)
-    cast_image = swapped.astype('float32')
-    # calculate composite band (e.g. here, GCI)
-    ndvi = (cast_image[1] - cast_image[0]) / (cast_image[1] + cast_image[0])
-    return ndvi
-
-#Most up to date code for GCI #LOAD B3 AND B5 in this order!!
-def get_gci(imgArray):
-    # swap axes (we needed to index into the list of lists)
-    swapped = imgArray.swapaxes(0,-1)
-    # make float (to do calculations)
-    cast_image = swapped.astype('float32')
-    # calculate composite band (e.g. here, GCI)
-    gci = (cast_image[1]/cast_image[0])-1
-    return gci
-
-# Stack 1-dimension GCI array and 2 empty dimensions to match the model input format requirements
-def dummy_dim(input=None, dummy_1=np.zeros((65,65)), dummy_2=np.zeros((65,65))):
-    return np.dstack([input, dummy_1, dummy_2])
-
-##########################################################################################
-
-
-# function to load single file (can be from 'gs:://BUCKET')
-def load_single_img(image_file='../raw_data/train/part-r-00090', bands=['B4', 'B3', 'B2'], intensify=True):
-    '''loads a single image from a file, outputs an imgArray and label'''
-    parsed_sat = read_sat_file(image_file, bands)
-    imgArray, label = transform_sat_img(parsed_sat, bands, intensify)
-    return imgArray, label
-
-
-# function to load a set of files from a directory
-def load_imgs(n_files, bands=['B4', 'B3', 'B2'], intensify=True, dataset='train', composite=''):
-    '''
-    This function creates a list of 3D imgArrays and a list of corresponding labels for
-    a set of satellite image files in a specific folder
-
-    Parameters:
-            n_files (int): number of files to parse and transform, max 319(train), 81(val), or 100(test)
-            bands (list): list of bands to process (order is important!)
-            intensify (bool): whether to scale or not (affects how bright plotted image looks(?))
-            dataset (string): one of: 'train' | 'val' | 'test'
-            composite (string): one of 'gci' | 'ndvi' | 'arvi'
-    Returns:
-            images (list): list of processed images (65x65 pixels each) in n-Dimensions (depends on number of bands chosen)
-            labels (list): list of corresponding labels (as int32)
+            dataset (Dataset): Tensorflow ParallelMapDataset of (images, labels)
     '''
 
-    filenames = []
-    images = []
-    labels = []
+    # parse TF records
+    dataset = (
+        tfrecords.interleave(tf.data.TFRecordDataset)
+        .map(parse_tfrecord, num_parallel_calls=AUTOTUNE)
+    )
 
-    filenames_suffix = dirlist(dataset)[0:n_files]
+    # select input bands
+    if input_bands == ['all']:
+        dataset = dataset.map(select_all_bands,
+                              num_parallel_calls=AUTOTUNE)
+        print("=========================loaded all bands========================")
 
-    for filename in filenames_suffix:
-        file = f'gs://wagon-data-batch913-drought_detection/{filename}'
-        if composite == 'gci':
-            bands=['B3', 'B5']
-            parsed_sat = read_sat_file(file, bands)
-            imgArray, label = transform_sat_img(parsed_sat, bands, intensify)
-            gci_tmp = get_gci(imgArray)
-            imgArray = dummy_dim(gci_tmp)
-        elif composite == 'ndvi':
-            bands=['B4', 'B5']
-            parsed_sat = read_sat_file(file, bands)
-            imgArray, label = transform_sat_img(parsed_sat, bands, intensify)
-            tmp = get_ndvi(imgArray)
-            imgArray = dummy_dim(tmp)
-        elif composite == 'arvi':
-            bands = ['B2', 'B4', 'B5']
-            parsed_sat = read_sat_file(file, bands)
-            imgArray, label = transform_sat_img(parsed_sat, bands, intensify)
-            tmp = get_arvi(imgArray)
-            imgArray = dummy_dim(tmp)
-        else:
-            parsed_sat = read_sat_file(file, bands)
-            imgArray, label = transform_sat_img(parsed_sat, bands, intensify)
-        filenames.append(file)
-        images.append(imgArray)
-        labels.append(label)
-    return filenames, images, labels
+    elif input_bands == ['composite']:
+        dataset = dataset.map(lambda x: select_composite_bands(x),
+                              num_parallel_calls=AUTOTUNE)
+        print("=====================loaded composite bands======================")
 
+    elif input_bands == ['rgb']:
+        dataset = dataset.map(select_rgb_bands,
+                              num_parallel_calls=AUTOTUNE)
+        print("=========================loaded rgb bands========================")
 
-# function to transform images into PrefetchDataset
-def make_prefetch_dataset(filenames, images, labels):
-    '''
-    This function transforms our data into the correct data structure for modelling.
+    else:
+        dataset = dataset.map(lambda x: select_bands(x, input_bands),
+                              num_parallel_calls=AUTOTUNE)
+        print(f"=================loaded {input_bands} bands==================")
 
-    Parameters: (takes output directly from load_imgs_set())
-            filenames (list): a list of satellite files
-            images (tuple): tuple of processed images in n-Dimensional arrays (depends on number of bands chosen)
-            label (list): list of corresponding labels (as int32)
-
-    Returns:
-            dataset (PrefetchDataset):
-                <PrefetchDataset shapes: {filename: (), image: (65, 65, 3), label: ()},
-                types: {filename: tf.string, image: tf.uint8, label: tf.int64}>
-    '''
-
-    # create Dataset from data
-    dataset = tf.data.Dataset.from_tensor_slices({'filename': filenames,
-                                                'image': images,
-                                                'label': labels})
-
-    # convert Dataset to PrefetchDataset
-    # "If the value tf.data.AUTOTUNE is used, then the buffer size is dynamically tuned"
-    # AUTO = tf.data.experimental.AUTOTUNE
-    dataset = dataset.prefetch(tf.data.AUTOTUNE)
+    # encode labels, remove bad images, return only image and label
+    dataset = (
+        dataset
+            .map(encode_label, num_parallel_calls=AUTOTUNE)     # one-hot encode labels
+            .map(compute_empty, num_parallel_calls=AUTOTUNE)    # tag bad images
+            .filter(lambda example: example['is_empty'] != 0)    # remove bad images
+            .map(select_image_label, num_parallel_calls=AUTOTUNE) # return only (images, labels)
+            .cache() # cache data to save previous operations from being executed during each epoch
+        )
 
     return dataset
 
+def prepare_dataset(ds, batch_size, shuffle_size=NUM_TRAIN, shuffle=False, augment=False):
 
-# final function to load data (read, convert, transform)
-def load_dataset(train_n=319, val_n=81, test_n=100,
-                 bands=['B4', 'B3', 'B2'], intensify=True, composite=''):
-    '''
-    This function loads train, validation, and test datasets from GCP
+    # Shuffle only the training set
+    if shuffle:
+        ds = ds.shuffle(shuffle_size)
 
-    Parameters:
-            train_n/val_n/test_n (int): number of image files to load for each dataset (max values as defaults)
-            bands (list): list of bands to process (order is important!)
+    # Batch all datasets.
+    ds = ds.batch(batch_size, num_parallel_calls=AUTOTUNE)
 
-    Returns:
-            train_ds (PrefetchDataset): train data
-            valid_ds (PrefetchDataset): validation data
-            test_ds (PrefetchDataset): test data
-            num_examples (int): total number of images (train + val + test)
-            num_classes (int):
+    # Resize all datasets.
+    ds = ds.map(lambda x, y: (image_resize(x), y),
+                num_parallel_calls=AUTOTUNE)
 
-    '''
-    print("=====================================loading train========================================")
-    # train data
-    filenames, images, labels = load_imgs(train_n, bands, intensify, dataset='train_full', composite=composite)
-    train_ds = make_prefetch_dataset(filenames, images, labels)
+    # Use data augmentation only on the training set.
+    if augment:
+        ds = ds.map(lambda x, y: (image_augmentation(x, training=True), y),
+                    num_parallel_calls=AUTOTUNE)
 
-    print("===================================loading validation=====================================")
-    # validation data set (data to help create metrics)
-    filenames_v, images_v, labels_v = load_imgs(val_n, bands, intensify, dataset='val', composite=composite)
-    valid_ds = make_prefetch_dataset(filenames_v, images_v, labels_v)
+    # Use repeat and buffered prefetching on all datasets.
+    return ds.repeat(-1).prefetch(buffer_size=AUTOTUNE)
 
-    print("=====================================loading test========================================")
-    # test data (data you DO NOT TOUCH! :P)
-    filenames_t, images_t, labels_t = load_imgs(test_n, bands, intensify, dataset='test', composite=composite)
-    test_ds = make_prefetch_dataset(filenames_t, images_t, labels_t)
+def load_dataset(data_path='data',
+                 input_bands=['all'],
+                 batch_size=BATCH_SIZE,
+                 train_shuffle_size=NUM_TRAIN):
+    # load training data in TFRecord format
+    train_tfrecords, val_tfrecords = load_files(data_path)
 
-    # total number of classes (4 in our case)
-    num_classes = len(set(labels))
-    # total number of images
-    num_examples = len(filenames) + len(filenames_v) + len(filenames_t)
+    # load correct multi-band images and labels from TFRecords
+    train_images_labels = get_dataset(train_tfrecords, input_bands)
+    val_images_labels = get_dataset(val_tfrecords, input_bands)
 
-    return train_ds, test_ds, valid_ds, num_examples, num_classes
+    # prepare dataset for training
+    train_dataset = prepare_dataset(train_images_labels, batch_size,
+                                    train_shuffle_size, shuffle=True)
+    val_dataset = prepare_dataset(val_images_labels, batch_size)
+
+    return train_dataset, val_dataset
 
 
-if __name__ == '__main__':
-    print("=======================Load dataset=======================")
-    train_ds, test_ds, valid_ds, num_examples, num_classes = load_dataset(train_n=1, val_n=1, test_n=1,
-                                                                          bands=['B2', 'B3', 'B4'])
-    print(train_ds.take(1))
-
-    # batch_size = 64 #should be 64
-    # train_ds = prepare_for_training(train_ds, num_classes, batch_size=batch_size)
-    # valid_ds = prepare_for_training(valid_ds, num_classes, batch_size=batch_size)
-    # data_shape = list(train_ds.take(1).element_spec[0].shape)
-    # print(data_shape)
+if __name__ == "__main__":
+    train_dataset, val_dataset = load_dataset(batch_size=1, train_shuffle_size=1)
+    train_image, train_label = next(iter(train_dataset))
+    print(train_image, train_label)
