@@ -66,6 +66,11 @@ def make_fig(df, x, y):
     return full_fig
 
 
+# predict with model (cache so it only loads once)
+def predict(model, image):
+    return model.predict(image.numpy())
+
+
 ############################### Save functions ##################################
 
 
