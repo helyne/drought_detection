@@ -63,7 +63,7 @@ EFFICIENT_NET = 'b0'    # EfficientNet model
 # ==============================================================================
 
 # list of input bands to use for training
-INPUT_BANDS = ['B5', 'B6', 'B7']     # can be one of:
+INPUT_BANDS = ['rgb']     # can be one of:
                             # ['all']
                             # ['composite']
                             # ['rgb']
@@ -76,7 +76,7 @@ BATCH_SIZE = 64
 EPOCHS = 50
 
 # model save path
-MODEL_NAME = f'{LOCAL_MODELS_PATH}/b5b6b7bands_b64_e50'
+MODEL_NAME = f'{LOCAL_MODELS_PATH}/rgbbands_b64_e50'
 
 # directory to train and val data
 DATA_PATH = LOCAL_DATA_PATH
