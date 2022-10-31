@@ -8,7 +8,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # This program built for i386-apple-darwin11.3.0
  
 
-# Make data base, printed on Sat Oct 29 13:11:59 2022
+# Make data base, printed on Sat Oct 29 13:21:39 2022
 
 # Variables
 
@@ -59,7 +59,6 @@ PATH = /Users/helyne/miniforge3/bin:/Users/helyne/miniforge3/condabin:/usr/local
 # environment
 LSCOLORS = Gxfxcxdxbxegedabagacad
 # environment
- 
 VIRTUAL_ENV = /Users/helyne/.pyenv/versions/3.8.12/envs/drought_detection
 # makefile (from `Makefile', line 81)
 RUNTIME_VERSION = 2.8
@@ -158,7 +157,7 @@ TERM_PROGRAM_VERSION = 445
 # environment
 NVM_DIR = /Users/helyne/.nvm
 # environment
-XPC_SERVICE_NAME = application.com.microsoft.VSCode.14599489.14599495.2BAEBCD6-D794-42F9-A827-527E323530CE
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.14599489.14599495.E5EB3FEE-776A-46C5-A2C5-1FA86C5D68C6
 # environment
 HOMEBREW_PREFIX = /opt/homebrew
 # automatic
@@ -226,7 +225,6 @@ _CE_CONDA =
 # environment
 LANG = C
 # variable set hash-table stats:
- 
 # Load=106/1024=10%, Rehash=0, Collisions=4/132=3%
 
 # Pattern-specific Variable Values
@@ -249,7 +247,6 @@ black:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
- 
 #  commands to execute (from `Makefile', line 11):
 	@black scripts/* drought_detection/*.py
 	
@@ -269,7 +266,6 @@ install_requirements:
 #  File has not been updated.
 #  commands to execute (from `Makefile', line 5):
 	@pip install -r requirements.txt
- 
 	
 
 pypi:
@@ -312,6 +308,7 @@ gcp_submit_training:
 	gcloud ai-platform jobs submit training ${JOB_NAME} \
 	--job-dir gs://${BUCKET_NAME}/${BUCKET_TRAINING_FOLDER} \
 	--package-path ${PACKAGE_NAME} \
+ 
 	--module-name ${PACKAGE_NAME}.${FILENAME} \
 	--python-version=${PYTHON_VERSION} \
 	--runtime-version=${RUNTIME_VERSION} \
@@ -453,7 +450,6 @@ install:
 
 # No `vpath' search paths.
 
- 
 # No general (`VPATH' variable) search path.
 
 # # of strings in strcache: 1
@@ -461,6 +457,6 @@ install:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Sat Oct 29 13:11:59 2022
+# Finished Make data base on Sat Oct 29 13:21:39 2022
 
  
