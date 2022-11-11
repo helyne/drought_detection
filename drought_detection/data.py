@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# keras_train.py
 # --------------------
 # Use Keras to train a simple CNN to predict a discrete
 # indicator of forage quality (inversely related to drought severity) from satellite
