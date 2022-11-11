@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 
 # --------------------
-# Use Keras to train a simple CNN to predict a discrete
-# indicator of forage quality (inversely related to drought severity) from satellite
-# images in 10 frequency bands. The ground truth label is the number of
+# process satellite images in 10 frequency bands. The ground truth label is the number of
 # cows that a human expert standing at the center of the satellite image at ground level
 # thinks the surrounding land could support (0, 1, 2, or 3+)
 
